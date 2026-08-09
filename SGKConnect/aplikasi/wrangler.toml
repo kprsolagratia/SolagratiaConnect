@@ -1,0 +1,23 @@
+# ============================================================
+#  SGKConnect — konfigurasi Cloudflare
+#  ------------------------------------------------------------
+#  Berkas ini memberi tahu Cloudflare bahwa proyek ini adalah
+#  situs statis (HTML, CSS, JS), bukan aplikasi server.
+#
+#  Diperlukan bila proyek dibuat sebagai "Worker".
+#  Kalau dibuat sebagai "Pages", berkas ini boleh diabaikan —
+#  tidak mengganggu.
+# ============================================================
+
+name = "solagratiaconnect"
+compatibility_date = "2026-01-01"
+
+# Seluruh berkas di folder ini disajikan apa adanya.
+[assets]
+directory = "./"
+
+# Alamat yang tidak ditemukan diarahkan ke 404.html
+not_found_handling = "404-page"
+
+# Alamat tetap seperti yang ditulis: /beranda.html, bukan /beranda
+html_handling = "none"
