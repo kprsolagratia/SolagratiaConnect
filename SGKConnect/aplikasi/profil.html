@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Profil · SGKConnect</title>
+<meta name="theme-color" content="#102A43">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="ico-btn burger" aria-label="Buka menu" data-icon="menu"></button>
+      <div class="spacer"></div>
+      <button class="ico-btn" data-lang-toggle style="font-family:Poppins;font-size:11.5px;font-weight:600">ID</button>
+      <button class="ico-btn" data-theme-toggle data-t-aria="umum.tema" aria-label="Ganti tema"></button>
+      <button class="ico-btn" data-icon="gear" aria-label="Pengaturan"></button>
+    </header>
+
+    <section class="rise">
+      <div class="eyebrow" data-t="profil.eyebrow">Kartu anggota digital</div>
+      <h1 style="margin-top:8px" data-t="profil.judul">Profil</h1>
+    </section>
+
+    <section class="grid hero-grid rise">
+      <article class="member-card">
+        <div class="row" style="gap:18px;align-items:flex-start;flex-wrap:wrap">
+          <div class="avatar" style="width:72px;height:72px;border:2px solid rgba(212,175,55,.6)" data-scene="face"></div>
+          <div style="flex:1;min-width:150px">
+            <h2 style="font-size:23px" id="pName"></h2>
+            <p style="color:var(--gold-soft);font-size:13px;margin-top:4px" id="pRole"></p>
+            <p style="font-size:11.5px;color:rgba(255,255,255,.6);margin-top:10px;letter-spacing:.14em" id="pId"></p>
+            <p style="font-size:11px;color:rgba(255,255,255,.45);margin-top:4px">GKKA-I Jemaat Sendawar</p>
+          </div>
+          <div class="qr" id="qr" aria-label="Kode QR keanggotaan"></div>
+        </div>
+        <div class="mstat">
+          <div><span data-t="profil.kehadiran">Kehadiran</span><b id="sHadir"></b></div>
+          <div><span>Baca Alkitab</span><b id="sBaca"></b></div>
+          <div><span data-t="profil.doa">Doa didukung</span><b id="sDoa"></b></div>
+          <div><span>Lencana</span><b id="sLencana"></b></div>
+        </div>
+      </article>
+
+      <div class="stack">
+        <article class="card">
+          <div class="lab" data-t="profil.pencapaian">Pencapaian</div>
+          <div class="row wrap" style="gap:8px;margin-top:12px" id="badges"></div>
+          <div class="hairline"></div>
+          <div class="lab" data-t="profil.progres">Progres iman</div>
+          <div style="margin-top:12px">
+            <div class="row-b small"><span>Rencana baca 365 hari</span><b id="l1"></b></div><div class="prog"><i id="b1"></i></div>
+          </div>
+          <div style="margin-top:12px">
+            <div class="row-b small"><span>Kehadiran kegiatan</span><b id="l2"></b></div><div class="prog"><i id="b2"></i></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="lab" data-t="profil.aksiCepat">Aksi cepat</div>
+          <div class="row wrap" style="margin-top:12px">
+            <button class="btn btn-gold btn-sm" id="showQr" data-t="profil.tampilkanQR">Tampilkan QR</button>
+            <button class="btn btn-line btn-sm" id="editBtn" data-t="profil.ubahProfil">Ubah profil</button>
+            <a class="btn btn-line btn-sm" href="index.html">Keluar</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="grid g2 rise">
+      <article class="card">
+        <div class="row-b">
+          <div class="lab">Biodata</div>
+          <button class="btn btn-line btn-sm" id="editBio">Lengkapi</button>
+        </div>
+        <p class="small muted" style="margin-top:8px">
+          Semuanya boleh dikosongkan. Isi seperlunya saja.</p>
+        <div id="bio" style="margin-top:14px"></div>
+      </article>
+      <article class="card">
+        <div class="lab">Foto profil</div>
+        <div class="row" style="margin-top:14px;align-items:flex-start">
+          <div class="avatar" id="avaBesar" style="width:88px;height:88px" data-scene="face"></div>
+          <div style="flex:1">
+            <p class="small muted">Foto tampil di kartu anggota dan daftar jemaat.
+              JPG atau PNG, maksimal 3 MB.</p>
+            <div class="row wrap" style="margin-top:12px">
+              <label class="btn btn-gold btn-sm" style="cursor:pointer">
+                Pilih foto
+                <input type="file" id="fileAva" accept="image/*" hidden>
+              </label>
+              <button class="btn btn-line btn-sm" id="hapusAva">Hapus foto</button>
+            </div>
+            <p class="small muted" id="statAva" style="margin-top:8px"></p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="grid g3 rise">
+      <article class="card">
+        <div class="lab" data-t="profil.riwayat">Riwayat kehadiran</div>
+        <div id="hist" style="margin-top:12px"></div>
+      </article>
+      <article class="card">
+        <div class="lab" data-t="profil.doaDidukung">Doa yang kamu dukung</div>
+        <div id="myPray" style="margin-top:12px"></div>
+      </article>
+      <article class="card">
+        <div class="lab" data-t="profil.pengaturan">Pengaturan</div>
+        <div id="settings" style="margin-top:12px"></div>
+      </article>
+    </section>
+  </main>
+</div>
+<nav class="mobile-nav"></nav>
+
+<div class="modal" id="modalBio"><div class="box" style="text-align:left;max-width:460px;max-height:88vh;overflow-y:auto">
+  <div class="row-b" style="margin-bottom:6px">
+    <h2 style="font-size:19px">Biodata</h2>
+    <button class="ico-btn" id="tutupBio" aria-label="Tutup" data-icon="x"></button>
+  </div>
+  <p class="small muted" style="margin-bottom:18px">
+    Tidak ada yang wajib diisi. Kosongkan yang tidak ingin Anda bagikan.</p>
+  <form id="formBio"></form>
+  <div class="row" style="margin-top:20px">
+    <button class="btn btn-line" style="flex:1" id="batalBio">Batal</button>
+    <button class="btn btn-gold" style="flex:1" id="simpanBio">Simpan</button>
+  </div>
+</div></div>
+
+<script src="assets/js/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>SGK_I18N.mulai();window.addEventListener("sgk:lang",()=>location.reload());</script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  SGK.shell('profil.html');
+
+  (async function () {
+    const me = await DB.auth.guard(); if (!me) return;
+    const nama = me.full_name || 'Anggota';
+    SGK.store.set('user', { name: nama, role: me.role === 'admin' ? 'Pengurus' : 'Pemuda', avatar: me.avatar_url || null });
+
+    pName.textContent = nama;
+    pRole.textContent = (me.role === 'admin' ? 'Pengurus' : me.role === 'leader' ? 'Pemimpin' : 'Pemuda');
+    pId.textContent = 'ID ' + (me.member_no || '—');
+    SGK.qr(qr, me.member_no || me.id || 'SGK');
+
+    const [hadirRaw, progRaw, doaRaw, semuaRaw] = await Promise.all([
+      DB.events.myAttendance().catch(() => []),
+      DB.bible.myProgress().catch(() => null),
+      DB.prayers.mySupports().catch(() => ({})),
+      DB.prayers.list().catch(() => [])
+    ]);
+    const hadir = hadirRaw || [];
+    const prog = { done: 0, total: 365, map: {}, ...(progRaw && !Array.isArray(progRaw) ? progRaw : {}) };
+    const doaSaya = doaRaw || {};
+    const pctBaca = prog.total ? Math.round(prog.done / prog.total * 100) : 0;
+    const jmlDoa = Object.values(doaSaya).filter(Boolean).length;
+    const pctHadir = hadir.length ? Math.round(hadir.filter(h=>h.status==='Hadir').length / hadir.length * 100) : 0;
+
+    sHadir.textContent = pctHadir + '%';
+    sBaca.textContent = pctBaca + '%';
+    sDoa.textContent = jmlDoa;
+    sLencana.innerHTML = [
+      prog.done >= 30 ? SGK.icon('check', 17, '#E8CD79') : '',
+      jmlDoa >= 5 ? SGK.icon('pray', 17, '#E8CD79') : '',
+      hadir.length >= 5 ? SGK.icon('heart', 17, '#E8CD79') : ''
+    ].filter(Boolean).join(' ') || '<span style="font-size:12px;opacity:.6">Belum ada</span>';
+
+    const lencana = [];
+    if (prog.done >= 30) lencana.push('30+ hari membaca');
+    if (jmlDoa >= 5) lencana.push('Pendoa setia');
+    if (hadir.length >= 5) lencana.push('Hadir ' + hadir.length + ' kegiatan');
+    badges.innerHTML = lencana.length ? lencana.map(b => `<span class="badge b-gold">${b}</span>`).join('')
+      : '<p class="small muted">Lencana akan muncul seiring keaktifanmu.</p>';
+
+    l1.textContent = pctBaca + '%'; b1.style.width = pctBaca + '%';
+    l2.textContent = pctHadir + '%'; b2.style.width = pctHadir + '%';
+
+    hist.innerHTML = hadir.length ? hadir.map((x,i) => `${i?'<div class="hairline"></div>':''}
+      <div class="row-b"><div><h4 style="font-size:13px">${x.judul}</h4><p class="small muted">${x.tgl}</p></div>
+      <span class="badge ${x.status==='Hadir'?'b-ok':'b-navy'}">${x.status}</span></div>`).join('')
+      : '<p class="small muted">Belum ada riwayat kehadiran.</p>';
+
+    const semua = semuaRaw || [];
+    const didukung = semua.filter(d => doaSaya[d.id]);
+    myPray.innerHTML = didukung.length
+      ? didukung.map((d,i) => `${i?'<div class="hairline"></div>':''}<div class="row-b">
+          <h4 style="font-size:13px">${d.title}</h4>
+          <span class="chip">${SGK.icon('pray',13)}</span></div>`).join('')
+      : '<p class="small muted">Belum ada. Buka halaman Pokok Doa dan tekan "Saya mendoakan".</p>';
+
+    settings.innerHTML = [['Notifikasi kegiatan',true],['Pengingat renungan pagi',true],['Tampilkan nama di pokok doa',false]]
+      .map(([l,on],i) => `${i?'<div class="hairline"></div>':''}<div class="row-b">
+        <span class="small">${l}</span>
+        <button class="chip ${on?'on':''}" data-toggle>${on?'Aktif':'Nonaktif'}</button></div>`).join('');
+    settings.addEventListener('click', e => {
+      const b = e.target.closest('[data-toggle]'); if(!b) return;
+      const on = b.classList.toggle('on'); b.textContent = on ? 'Aktif' : 'Nonaktif';
+    });
+
+    /* ---------- biodata (semua opsional) ---------- */
+    const ISIAN = [
+      { k:'full_name',  l:'Nama lengkap',        t:'text', ph:'Theo Rakyan' },
+      { k:'phone',      l:'Nomor HP / WhatsApp', t:'tel',  ph:'0812xxxxxxx' },
+      { k:'birthday',   l:'Tanggal lahir',       t:'date' },
+      { k:'occupation', l:'Pekerjaan / studi',   t:'text', ph:'Mahasiswa Teknik' },
+      { k:'address',    l:'Alamat',              t:'text', ph:'Jl. ...' },
+      { k:'emergency_contact', l:'Kontak darurat', t:'text', ph:'Nama & nomor yang bisa dihubungi' },
+      { k:'bio',        l:'Tentang saya',        t:'panjang', ph:'Satu-dua kalimat singkat' },
+      { k:'show_phone', l:'Nomor HP boleh dilihat anggota lain', t:'pilih',
+        opsi:[['false','Tidak — hanya pengurus'],['true','Ya — boleh dilihat']] },
+      { k:'show_birthday', l:'Tanggal lahir muncul di daftar ulang tahun', t:'pilih',
+        opsi:[['true','Ya'],['false','Tidak']] }
+    ];
+    const LABEL = Object.fromEntries(ISIAN.map(f => [f.k, f.l]));
+
+    function gambarBio() {
+      const tampil = ['phone','birthday','occupation','address','emergency_contact','bio']
+        .filter(k => me[k]);
+      bio.innerHTML = tampil.length ? tampil.map((k,i) => {
+        let v = me[k];
+        if (k === 'birthday') v = new Date(v).toLocaleDateString('id-ID',
+          { day:'numeric', month:'long', year:'numeric' });
+        const tanda = (k === 'phone' && !me.show_phone)
+          ? ' <span class="badge b-navy" style="font-size:9px">hanya pengurus</span>' : '';
+        return `${i?'<div class="hairline"></div>':''}
+          <div class="row-b wrap" style="gap:10px">
+            <span class="small muted" style="min-width:120px">${LABEL[k]}</span>
+            <span style="font-size:13.5px;text-align:right;flex:1">${String(v)}${tanda}</span>
+          </div>`;
+      }).join('')
+      : '<p class="small muted">Belum ada yang diisi. Tekan <b>Lengkapi</b> bila ingin menambahkan.</p>';
+    }
+    gambarBio();
+
+    function pasangFoto(url) {
+      document.querySelectorAll('#avaBesar, .member-card .avatar, .side-user .avatar, .topbar .avatar')
+        .forEach(a => {
+          a.removeAttribute('data-scene');
+          a.innerHTML = `<img src="${url}" alt="Foto profil" style="width:100%;height:100%;object-fit:cover">`;
+        });
+    }
+    if (me.avatar_url) pasangFoto(me.avatar_url);
+
+    function bukaBio() {
+      formBio.innerHTML = ISIAN.map(f => {
+        const v = me[f.k] ?? (f.t === 'pilih' ? 'false' : '');
+        let kontrol;
+        if (f.t === 'panjang') {
+          kontrol = `<textarea id="b_${f.k}" style="width:100%;min-height:80px;padding:11px 13px;
+            border-radius:11px;border:1px solid var(--line);background:var(--bg);font:inherit;
+            font-size:13.5px;color:var(--ink)" placeholder="${f.ph||''}">${v||''}</textarea>`;
+        } else if (f.t === 'pilih') {
+          kontrol = `<select id="b_${f.k}" style="width:100%;padding:11px 13px;border-radius:11px;
+            border:1px solid var(--line);background:var(--bg);font:inherit;font-size:13.5px;
+            color:var(--ink)">${f.opsi.map(([ov,ot]) =>
+            `<option value="${ov}"${String(v)===ov?' selected':''}>${ot}</option>`).join('')}</select>`;
+        } else {
+          const val = (f.t === 'date' && v) ? String(v).slice(0,10) : (v||'');
+          kontrol = `<input id="b_${f.k}" type="${f.t}" value="${val}" placeholder="${f.ph||''}">`;
+        }
+        return `<div class="field"><label for="b_${f.k}">${f.l}</label>${kontrol}</div>`;
+      }).join('');
+      modalBio.classList.add('show');
+    }
+    const tutupModalBio = () => modalBio.classList.remove('show');
+
+    editBio.addEventListener('click', bukaBio);
+    editBtn.addEventListener('click', bukaBio);
+    tutupBio.addEventListener('click', tutupModalBio);
+    batalBio.addEventListener('click', tutupModalBio);
+    modalBio.addEventListener('click', e => { if (e.target === modalBio) tutupModalBio(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') tutupModalBio(); });
+
+    simpanBio.addEventListener('click', async () => {
+      const isi = {};
+      for (const f of ISIAN) {
+        let v = document.getElementById('b_' + f.k).value.trim();
+        if (f.t === 'pilih') v = (v === 'true');
+        isi[f.k] = v;
+      }
+      if (!isi.full_name) { SGK.toast('Nama lengkap sebaiknya diisi.'); return; }
+      simpanBio.disabled = true; simpanBio.textContent = 'Menyimpan…';
+      try {
+        const baru = await DB.profile.update(isi);
+        Object.assign(me, baru || isi);
+        gambarBio();
+        pName.textContent = me.full_name;
+        SGK.store.set('user', Object.assign(SGK.store.get('user', {}), { name: me.full_name }));
+        tutupModalBio();
+        SGK.toast('Biodata tersimpan.');
+      } catch (e) { /* pesan sudah tampil */ }
+      finally { simpanBio.disabled = false; simpanBio.textContent = 'Simpan'; }
+    });
+
+    /* ---------- foto profil ---------- */
+    fileAva.addEventListener('change', async () => {
+      const f = fileAva.files[0]; if (!f) return;
+      statAva.textContent = 'Mengunggah…';
+      try {
+        const hasil = await DB.profile.uploadAvatar(f);
+        if (hasil && hasil.url) {
+          pasangFoto(hasil.url);
+          me.avatar_url = hasil.url;
+          SGK.store.set('user', Object.assign(SGK.store.get('user', {}), { avatar: hasil.url }));
+          statAva.textContent = 'Foto diperbarui.';
+        } else { statAva.textContent = ''; }
+      } catch (e) {
+        statAva.textContent = '';
+        SGK.toast(e.message || 'Gagal mengunggah foto.');
+      } finally { fileAva.value = ''; }
+    });
+
+    hapusAva.addEventListener('click', async () => {
+      if (!me.avatar_url) { SGK.toast('Belum ada foto profil.'); return; }
+      if (!confirm('Hapus foto profil?')) return;
+      try {
+        await DB.profile.removeAvatar();
+        me.avatar_url = null;
+        SGK.store.set('user', Object.assign(SGK.store.get('user', {}), { avatar: null }));
+        document.querySelectorAll('#avaBesar, .member-card .avatar').forEach(a => {
+          a.innerHTML = ''; a.dataset.scene = 'face'; delete a.dataset.painted;
+        });
+        SGK.paintScenes();
+        statAva.textContent = 'Foto dihapus.';
+      } catch (e) { SGK.toast('Gagal menghapus foto.'); }
+    });
+
+    showQr.addEventListener('click', () => App.checkin('Kartu anggota digital'));
+    document.querySelectorAll('a[href="index.html"]').forEach(a =>
+      a.addEventListener('click', e => { e.preventDefault(); App.logout(); }));
+
+    App.bindAll();
+    SGK.paintScenes();
+  })();
+</script>
+</body>
+</html>

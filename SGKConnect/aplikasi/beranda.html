@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Beranda · SGKConnect</title>
+<meta name="theme-color" content="#102A43">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="ico-btn burger" aria-label="Buka menu" data-icon="menu"></button>
+      <label class="search">
+        <span data-icon="search" data-size="17"></span>
+        <input id="q" type="search" placeholder="Cari renungan, kegiatan, atau anggota…" aria-label="Cari">
+      </label>
+      <div class="spacer"></div>
+      <button class="ico-btn" data-icon="bell" aria-label="Notifikasi"></button>
+      <button class="ico-btn" data-lang-toggle style="font-family:Poppins;font-size:11.5px;font-weight:600">ID</button>
+      <button class="ico-btn" data-theme-toggle data-t-aria="umum.tema" aria-label="Ganti tema"></button>
+      <div class="avatar" data-scene="face"></div>
+    </header>
+
+    <section class="rise">
+      <h1 id="greet">Selamat datang</h1>
+      <p class="muted small" style="margin-top:6px;font-style:italic">"Kiranya Tuhan memberkati langkahmu hari ini."</p>
+    </section>
+
+    <section class="grid hero-grid rise">
+      <article class="hero">
+        <div data-scene="worship"></div>
+        <div class="hero-copy">
+          <div class="k" id="heroDate"></div>
+          <h2>Rise Together,<br>Shine for Christ</h2>
+          <a class="btn btn-gold" href="kegiatan.html">Lihat kegiatan</a>
+          <button class="btn btn-ghost" id="btnCheckin">Check-in QR</button>
+        </div>
+      </article>
+
+      <article class="card stack" style="justify-content:center">
+        <div>
+          <div class="lab" data-t="beranda.kegiatanBerikut">Kegiatan terdekat</div>
+          <h3 id="nextTitle" style="margin-top:8px">—</h3>
+        </div>
+        <div class="count" id="cd"></div>
+        <span class="chip" id="nextPlace"></span>
+        <button class="btn btn-navy btn-full" data-rsvp="e1">Konfirmasi kehadiran</button>
+        <p class="small muted" style="text-align:center" id="nextCount"></p>
+      </article>
+    </section>
+
+    <section class="grid g3 rise">
+      <article class="card">
+        <div class="lab" data-t="beranda.renunganHariIni">Renungan hari ini</div>
+        <h3 style="margin:10px 0 8px" id="devTitle"></h3>
+        <p class="verse" id="devBody"></p>
+        <div class="ref" style="margin-top:10px" id="devRef"></div>
+        <div class="row" style="margin-top:14px">
+          <a class="btn btn-navy btn-sm" href="alkitab.html">Baca selengkapnya</a>
+          <button class="ico-btn" data-icon="mark" aria-label="Simpan renungan" id="saveDev"></button>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="lab" data-t="beranda.ayatMinggu">Ayat minggu ini</div>
+        <p class="font-display" style="font-size:16px;line-height:1.6;margin-top:12px;font-weight:400" id="vsText"></p>
+        <div class="ref" style="margin-top:10px" id="vsRef"></div>
+        <div class="row wrap" style="margin-top:14px">
+          <button class="chip" id="shareVs">Bagikan</button><span class="chip">Simpan</span><span class="chip">Hafalkan</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="lab" data-t="beranda.pokokDoa">Pokok doa</div>
+        <div class="row" style="margin-top:10px"><span data-icon="pray" data-size="17"></span>
+          <h4 id="prayTitle"></h4></div>
+        <p class="verse" style="margin-top:8px" id="prayBody"></p>
+        <span class="chip" style="margin-top:12px" id="prayCount"></span>
+        <button class="btn btn-gold btn-full" style="margin-top:12px" data-pray="p1">Saya mendoakan</button>
+      </article>
+    </section>
+
+    <section class="card rise">
+      <div class="row-b"><div class="lab" data-t="beranda.aksesCepat">Akses cepat</div>
+        <a class="ref" style="font-size:12px" href="komunitas.html" data-t="umum.lihatSemua">Lihat semua</a></div>
+      <nav class="quick" id="quick"></nav>
+    </section>
+
+    <section class="grid g4 rise">
+      <article class="card">
+        <div class="lab" data-t="beranda.kalender">Kalender</div>
+        <div class="cal" id="cal"></div>
+        <p class="small muted" style="margin-top:10px">3 kegiatan minggu ini</p>
+      </article>
+
+      <article class="card">
+        <div class="row-b"><div class="lab" data-t="beranda.fotoTerbaru">Dokumentasi terbaru</div>
+        <a class="ref" style="font-size:11px" href="galeri.html">Semua</a></div>
+        <div class="thumbs">
+          <div data-scene="fellow"></div><div data-scene="bible"></div><div data-scene="camp"></div>
+          <div data-scene="pray"></div><div data-scene="worship"></div><div data-scene="music"></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="lab" data-t="beranda.dengarkan">Podcast pilihan</div>
+        <div id="pods" style="margin-top:10px"></div>
+      </article>
+
+      <article class="card">
+        <div class="lab" data-t="beranda.ulangTahun">Ulang tahun</div>
+        <div id="bdays" style="margin-top:10px"></div>
+        <button class="btn btn-navy btn-full btn-sm" style="margin-top:12px" id="greetBtn" data-t="beranda.kirimUcapan">Kirim ucapan</button>
+      </article>
+    </section>
+
+    <section class="card rise">
+      <div class="row-b"><div class="lab" data-t="beranda.pengumuman">Pengumuman</div><a class="ref" style="font-size:12px" href="komunitas.html">Arsip</a></div>
+      <div id="ann" style="margin-top:12px"></div>
+    </section>
+  </main>
+</div>
+<nav class="mobile-nav" aria-label="Navigasi utama"></nav>
+
+<script src="assets/js/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>SGK_I18N.mulai();window.addEventListener("sgk:lang",()=>location.reload());</script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  SGK.shell('beranda.html');
+
+  (async function () {
+    const me = await DB.auth.guard();
+    if (!me) return;
+    const nama = (me && (me.full_name || me.nama)) || 'Anggota';
+    SGK.store.set('user', { name: nama, role: me.role === 'admin' ? 'Pengurus' : 'Pemuda', avatar: me.avatar_url || null });
+    const h = new Date().getHours();
+    const sapa = h < 11 ? 'beranda.pagi' : h < 15 ? 'beranda.siang'
+               : h < 19 ? 'beranda.sore' : 'beranda.malam';
+    greet.textContent = SGK.t(sapa) + ', ' + String(nama).split(' ')[0];
+
+    /* --- semua data diambil serentak, bukan satu per satu --- */
+    const [set, evs, dev, doa, ann_, foto, md, ultah] = await Promise.all([
+      DB.community.settings().catch(() => null),
+      DB.events.list().catch(() => []),
+      DB.bible.devotionToday().catch(() => null),
+      DB.prayers.list().catch(() => []),
+      DB.community.announcements().catch(() => []),
+      DB.community.gallery(6).catch(() => []),
+      DB.community.media(null, 3).catch(() => []),
+      DB.profile.birthdays().catch(() => [])
+    ]);
+
+    if (set) {
+      if (set.greeting_note) document.querySelector('#greet + p').textContent = '"' + set.greeting_note + '"';
+      if (set.hero_title) {
+        const ht = document.querySelector('.hero-copy h2');
+        ht.innerHTML = set.hero_title.replace(/,\s*/, ',<br>');
+      }
+      if (set.hero_image_url) {
+        const hero = document.querySelector('.hero [data-scene]');
+        hero.removeAttribute('data-scene');
+        hero.innerHTML = `<img src="${set.hero_image_url}" alt=""
+          style="width:100%;height:100%;object-fit:cover">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,
+            rgba(11,30,51,.1) 40%, rgba(11,30,51,.75))"></div>`;
+      } else if (set.hero_scene) {
+        document.querySelector('.hero [data-scene]').dataset.scene = set.hero_scene;
+      }
+      if (set.verse_text) vsText.textContent = '"' + set.verse_text + '"';
+      if (set.verse_ref) vsRef.textContent = set.verse_ref;
+      if (set.app_name) document.title = 'Beranda · ' + set.app_name;
+    }
+
+    /* --- kegiatan terdekat --- */
+    const ev = (evs || [])[0];
+    if (ev) {
+      heroDate.textContent = (ev.date_text || new Date(ev.starts_at)
+        .toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' })).toUpperCase();
+      nextTitle.textContent = ev.title;
+      nextPlace.innerHTML = SGK.icon('pin', 14) + (ev.location || 'Lokasi menyusul');
+      nextCount.textContent = (ev.going || 0) + ' ' + SGK.t('beranda.sudahDaftar');
+      SGK.countdown(cd, ev.starts_at);
+      document.querySelector('[data-rsvp]').dataset.rsvp = ev.id;
+      btnCheckin.addEventListener('click', () => App.checkin(ev.title, ev.id));
+    } else {
+      nextTitle.textContent = SGK.t('beranda.belumAdaKegiatan');
+      nextPlace.textContent = SGK.t('beranda.agendaMenyusul');
+      nextCount.textContent = '';
+      cd.innerHTML = '<p class="small muted" style="padding:8px 0">Pengurus dapat menambahkannya di Kelola Konten.</p>';
+      document.querySelector('[data-rsvp]').hidden = true;
+      heroDate.textContent = '';
+    }
+
+    /* --- renungan & ayat --- */
+
+    if (dev) {
+      devTitle.textContent = dev.title;
+      devBody.textContent = (dev.body || '').slice(0, 165) + '…';
+      devRef.textContent = dev.verse_ref || '';
+      vsText.textContent = '"' + (dev.verse_text || DATA.ayatMinggu.teks) + '"';
+      vsRef.textContent = dev.verse_ref || DATA.ayatMinggu.ref;
+    }
+
+    /* --- pokok doa teratas --- */
+    const p0 = (doa || [])[0];
+    if (!p0) {
+      prayTitle.textContent = SGK.t('beranda.belumAdaDoa');
+      prayBody.textContent = SGK.t('beranda.jadiPertama');
+      prayCount.textContent = '';
+      document.querySelector('[data-pray]').hidden = true;
+    }
+    if (p0) {
+      prayTitle.textContent = p0.title;
+      prayBody.textContent = p0.body;
+      prayCount.textContent = (p0.supports || 0) + ' orang sedang mendoakan';
+      const b = document.querySelector('[data-pray]');
+      b.dataset.pray = p0.id;
+      prayCount.dataset.praycount = p0.id; prayCount.dataset.base = p0.supports || 0;
+    }
+
+    /* --- akses cepat --- */
+    quick.innerHTML = [
+      ['book', SGK.t('beranda.renunganHariIni').split(' ')[0], 'alkitab.html'],
+      ['book', SGK.t('nav.alkitab'), 'alkitab.html'],
+      ['pray', SGK.t('nav.doa'), 'doa.html'],
+      ['cal', SGK.t('nav.kegiatan'), 'kegiatan.html'],
+      ['users', SGK.t('nav.komunitas'), 'komunitas.html'],
+      ['play', SGK.t('nav.galeri'), 'galeri.html'],
+      ['qr', SGK.t('beranda.checkin'), 'kegiatan.html'],
+      ['bell', SGK.t('beranda.pengumuman'), 'komunitas.html'],
+      ['chat', SGK.t('komunitas.forum'), 'komunitas.html']
+    ].map(([i,l,href]) => `<a href="${href}"><div class="b">${SGK.icon(i,20)}</div><span>${l}</span></a>`).join('');
+
+    App.calendar(cal, evs.map(e => new Date(e.starts_at))
+      .filter(d => d.getMonth() === new Date().getMonth()).map(d => d.getDate()));
+
+    /* --- galeri dokumentasi (foto asli bila ada) --- */
+
+    if (foto.length) {
+      document.querySelector('.thumbs').innerHTML = foto.map(f =>
+        `<div><img src="${f.image_url}" alt="${(f.title||'').replace(/"/g,'')}" loading="lazy"
+          style="width:100%;height:100%;object-fit:cover"></div>`).join('');
+    }
+
+    /* --- media & podcast --- */
+
+    pods.innerHTML = md.length ? md.map(x => `<a class="row" style="margin-bottom:12px"
+        href="${x.url || '#'}" target="_blank" rel="noopener">
+        <div class="th" style="width:50px;height:50px;border-radius:12px;overflow:hidden"
+          ${x.thumb_url ? '' : 'data-scene="mic"'}>
+          ${x.thumb_url ? `<img src="${x.thumb_url}" alt="" style="width:100%;height:100%;object-fit:cover">` : ''}</div>
+        <div style="flex:1"><h4 style="font-size:13px">${x.title}</h4>
+          <p class="small muted">${[x.speaker, x.duration].filter(Boolean).join(' · ')}</p></div>
+      </a>`).join('')
+      : '<p class="small muted">Belum ada media. Pengurus dapat menambahkannya di Kelola Konten.</p>';
+
+    bdays.innerHTML = (ultah && ultah.length) ? ultah.slice(0,3).map(x => `
+        <div class="row" style="margin-bottom:10px">
+          <div class="avatar"${x.avatar_url ? '' : ' data-scene="face"'}>${x.avatar_url
+            ? `<img src="${x.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover">` : ''}</div>
+          <div><h4 style="font-size:13px">${x.full_name || x.nama}</h4>
+            <p class="small muted">${x.ket}</p></div></div>`).join('')
+      : '<p class="small muted">Tidak ada yang berulang tahun bulan ini.</p>';
+
+
+    ann.innerHTML = ann_.map((a,i) => `${i?'<div class="hairline"></div>':''}
+        <div class="row-b"><div><h4 style="font-size:13.5px">${a.title}</h4>
+        <p class="small muted" style="margin-top:3px">${a.body || ''}</p></div>
+        <span class="chip">${a.publish_on}</span></div>`).join('');
+
+    App.bindAll();
+    SGK.paintScenes();
+  })();
+
+  saveDev.addEventListener('click', () => SGK.toast('Renungan disimpan ke koleksimu.'));
+  shareVs.addEventListener('click', () => App.share(vsText.textContent + ' — ' + vsRef.textContent));
+  greetBtn.addEventListener('click', () => SGK.toast('Ucapan terkirim.'));
+</script>
+</body>
+</html>

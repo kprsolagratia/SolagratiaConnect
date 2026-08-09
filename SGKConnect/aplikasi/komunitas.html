@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Komunitas · SGKConnect</title>
+<meta name="theme-color" content="#102A43">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="ico-btn burger" aria-label="Buka menu" data-icon="menu"></button>
+      <label class="search"><span data-icon="search" data-size="17"></span>
+        <input id="q" type="search" placeholder="Cari kelompok, tim, atau diskusi…" aria-label="Cari"></label>
+      <div class="spacer"></div>
+      <button class="ico-btn" data-lang-toggle style="font-family:Poppins;font-size:11.5px;font-weight:600">ID</button>
+      <button class="ico-btn" data-theme-toggle data-t-aria="umum.tema" aria-label="Ganti tema"></button>
+      <div class="avatar" data-scene="face"></div>
+    </header>
+
+    <section class="rise">
+      <div class="eyebrow" data-t="komunitas.eyebrow">Koinonia</div>
+      <h1 style="margin-top:8px" data-t="komunitas.judul">Komunitas</h1>
+      <p class="muted small" style="margin-top:8px">Bertumbuh bersama dalam kelompok sel, tim pelayanan, dan diskusi.</p>
+    </section>
+
+    <section class="rise">
+      <div class="row-b"><h2 data-t="komunitas.kelompokSel">Kelompok sel</h2><span class="chip" id="totalGs"></span></div>
+      <div class="grid g4" style="margin-top:14px" id="groups"></div>
+    </section>
+
+    <section class="rise">
+      <h2 data-t="komunitas.timPelayanan">Tim pelayanan</h2>
+      <div class="grid g4" style="margin-top:14px" id="teamsEl"></div>
+    </section>
+
+    <section class="grid hero-grid rise">
+      <article class="card">
+        <div class="row-b"><h2 style="font-size:19px" data-t="komunitas.forum">Forum diskusi</h2>
+          <button class="btn btn-gold btn-sm" id="newTopic" data-t="komunitas.buatTopik">Buat topik</button></div>
+        <div id="forum" style="margin-top:14px"></div>
+      </article>
+
+      <div class="stack">
+        <article class="card">
+          <div class="lab" data-t="komunitas.pengumuman">Pengumuman gereja</div>
+          <div id="ann" style="margin-top:12px"></div>
+        </article>
+        <article class="card">
+          <div class="lab" data-t="komunitas.galeri">Galeri &amp; media</div>
+          <div class="thumbs">
+            <div data-scene="worship"></div><div data-scene="fellow"></div><div data-scene="camp"></div>
+            <div data-scene="music"></div><div data-scene="bible"></div><div data-scene="pray"></div>
+          </div>
+          <div class="row" style="margin-top:14px">
+            <button class="btn btn-line btn-sm" style="flex:1" id="galleryBtn" data-t="komunitas.bukaGaleri">Buka galeri</button>
+            <button class="btn btn-navy btn-sm" style="flex:1" id="liveBtn" data-t="komunitas.streaming">Streaming</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+</div>
+<nav class="mobile-nav"></nav>
+
+<script src="assets/js/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>SGK_I18N.mulai();window.addEventListener("sgk:lang",()=>location.reload());</script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  SGK.shell('komunitas.html');
+
+  (async function () {
+    const me = await DB.auth.guard(); if (!me) return;
+    SGK.store.set('user', { name: me.full_name || 'Anggota', role: me.role === 'admin' ? 'Pengurus' : 'Pemuda', avatar: me.avatar_url || null });
+    const [cellsRaw, teamsRaw, tpRaw, anRaw, fotoRaw] = await Promise.all([
+      DB.community.groups('cell').catch(() => []),
+      DB.community.groups('team').catch(() => []),
+      DB.community.topics().catch(() => []),
+      DB.community.announcements().catch(() => []),
+      DB.community.gallery(6).catch(() => [])
+    ]);
+    const cells = cellsRaw || [], teams = teamsRaw || [];
+
+    totalGs.textContent = cells.length + ' kelompok';
+
+    groups.innerHTML = cells.map(g => `<article class="card" data-name="${g.name} ${g.leader_name||''}" style="padding:0;overflow:hidden">
+        <div style="height:110px" data-scene="${g.scene||'fellow'}"></div>
+        <div style="padding:16px">
+          <h3 style="font-size:16px">${g.name}</h3>
+          <p class="small muted" style="margin-top:4px">Pemimpin: ${g.leader_name || 'Menyusul'}</p>
+          <div class="row wrap" style="gap:7px;margin:12px 0">
+            ${g.members ? `<span class="chip">${g.members} anggota</span>` : ''}
+            <span class="chip">${g.schedule || 'Jadwal menyusul'}</span></div>
+          <button class="btn btn-gold btn-sm btn-full" data-join="${g.id}" data-label="${g.name}">Gabung kelompok</button>
+        </div></article>`).join('');
+
+    teamsEl.innerHTML = teams.map(t => `<article class="card" data-name="${t.name}">
+        <div class="row">
+          <div class="th" style="width:52px;height:52px;border-radius:14px;overflow:hidden" data-scene="${t.scene||'music'}"></div>
+          <div><h4>${t.name}</h4><p class="small muted">${t.schedule || t.description || ''}</p></div>
+        </div>
+        <button class="btn btn-line btn-sm btn-full" style="margin-top:14px" data-join="${t.id}" data-label="${t.name}">Daftar melayani</button>
+      </article>`).join('');
+
+    const tp = tpRaw || [];
+    forum.innerHTML = tp.length ? tp.map((f,i) => `${i?'<div class="hairline"></div>':''}
+      <div class="row-b" data-name="${f.title}">
+        <div><h4 style="font-size:14px">${f.title}</h4>
+          <p class="small muted" style="margin-top:4px">${f.author} · ${f.waktu}</p></div>
+        <span class="chip">${SGK.icon('chat',13)} ${f.replies}</span></div>`).join('')
+      : '<p class="small muted">Belum ada topik diskusi.</p>';
+
+    const an = anRaw || [];
+    ann.innerHTML = an.map((a,i) => `${i?'<div class="hairline"></div>':''}
+      <div><div class="row-b"><h4 style="font-size:13.5px">${a.title}</h4>
+      <span class="small muted">${a.publish_on}</span></div>
+      <p class="small muted" style="margin-top:4px">${a.body || ''}</p></div>`).join('');
+
+    /* --- galeri foto asli --- */
+    const foto = fotoRaw || [];
+    if (foto.length) {
+      document.querySelector('.thumbs').innerHTML = foto.map(f =>
+        `<div><img src="${f.image_url}" alt="${(f.title||'').replace(/"/g,'')}" loading="lazy"
+          style="width:100%;height:100%;object-fit:cover"></div>`).join('');
+    }
+
+    document.querySelectorAll('[data-join]').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true;
+      await DB.community.join(b.dataset.join);
+      b.setAttribute('aria-pressed','true');
+      b.innerHTML = SGK.icon('check',15) + 'Permintaan terkirim';
+      SGK.toast('Permintaan bergabung ke ' + b.dataset.label + ' dikirim ke pemimpin.');
+    }));
+
+    App.filter('#q', '[data-name]');
+    App.bindAll();
+    SGK.paintScenes();
+  })();
+
+  newTopic.addEventListener('click', () => SGK.toast('Form topik baru terbuka untuk anggota terverifikasi.'));
+  liveBtn.addEventListener('click', () => SGK.toast('Streaming ibadah dimulai setiap Minggu 09.00.'));
+</script>
+</body>
+</html>

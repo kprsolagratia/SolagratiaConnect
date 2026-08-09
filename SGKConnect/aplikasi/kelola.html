@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kelola Konten · SGKConnect</title>
+<meta name="theme-color" content="#102A43">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<link rel="stylesheet" href="assets/css/app.css">
+<style>
+  .tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+  .tbl th{text-align:left;padding:10px 10px;font-size:10px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--muted);font-weight:600;white-space:nowrap}
+  .tbl td{padding:12px 10px;border-top:1px solid var(--line);vertical-align:top}
+  .tbl tr:hover td{background:var(--gray)}
+  .aksi{display:flex;gap:6px;justify-content:flex-end}
+  .fld{margin-bottom:14px}
+  .fld label{display:block;font-size:12px;font-weight:600;margin-bottom:6px}
+  .fld input,.fld textarea,.fld select{
+    width:100%;padding:11px 13px;border-radius:11px;border:1px solid var(--line);
+    background:var(--bg);font:inherit;font-size:13.5px;color:var(--ink);outline:none}
+  .fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--gold)}
+  .fld textarea{min-height:92px;resize:vertical;line-height:1.6}
+  .fld .hint{font-size:11px;color:var(--muted);margin-top:5px}
+  .sheet{position:fixed;inset:0;z-index:150;display:grid;place-items:center;padding:20px;
+    background:rgba(6,17,29,.55);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:.25s}
+  .sheet.show{opacity:1;pointer-events:auto}
+  .sheet .box{background:var(--surface);border-radius:24px;padding:26px;width:100%;max-width:520px;
+    max-height:88vh;overflow-y:auto;box-shadow:var(--sh-lift);transform:scale(.97);transition:.25s}
+  .sheet.show .box{transform:scale(1)}
+  .kosong{padding:40px 20px;text-align:center;color:var(--muted)}
+  @media(max-width:760px){
+    .tbl thead{display:none}
+    .tbl tr{display:block;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;padding:6px}
+    .tbl td{display:block;border:0;padding:6px 10px}
+    .aksi{justify-content:flex-start}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="ico-btn burger" aria-label="Buka menu" data-icon="menu"></button>
+      <label class="search"><span data-icon="search" data-size="17"></span>
+        <input id="q" type="search" placeholder="Cari dalam daftar…" aria-label="Cari"></label>
+      <div class="spacer"></div>
+      <button class="ico-btn" data-lang-toggle style="font-family:Poppins;font-size:11.5px;font-weight:600">ID</button>
+      <button class="ico-btn" data-theme-toggle data-t-aria="umum.tema" aria-label="Ganti tema"></button>
+      <div class="avatar" data-scene="face"></div>
+    </header>
+
+    <section class="row-b wrap rise">
+      <div>
+        <div class="eyebrow" data-t="admin.eyebrow">Panel pengurus</div>
+        <h1 style="margin-top:8px" data-t="kelola.judul">Kelola Konten</h1>
+        <p class="muted small" style="margin-top:8px">
+          Tambah, ubah, dan hapus isi aplikasi tanpa membuka database.</p>
+      </div>
+      <button class="btn btn-gold" id="tambahBtn">+ Tambah</button>
+    </section>
+
+    <div class="tabs rise" id="tabs"></div>
+
+    <section class="card rise" style="padding:8px 8px 4px">
+      <div style="overflow-x:auto">
+        <table class="tbl"><thead id="thead"></thead><tbody id="tbody"></tbody></table>
+      </div>
+      <div class="kosong" id="kosong" hidden></div>
+    </section>
+
+    <section id="panelKhusus" class="rise" hidden></section>
+
+    <p class="small muted rise" id="jejak" style="text-align:center"></p>
+  </main>
+</div>
+<nav class="mobile-nav"></nav>
+
+<div class="sheet" id="sheet"><div class="box">
+  <div class="row-b" style="margin-bottom:18px">
+    <h2 id="sheetTitle" style="font-size:19px">Tambah</h2>
+    <button class="ico-btn" id="tutup" aria-label="Tutup" data-icon="x"></button>
+  </div>
+  <form id="form"></form>
+  <div class="row" style="margin-top:20px">
+    <button class="btn btn-line" style="flex:1" id="batal">Batal</button>
+    <button class="btn btn-gold" style="flex:1" id="simpan">Simpan</button>
+  </div>
+</div></div>
+
+<script src="assets/js/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>SGK_I18N.mulai();window.addEventListener("sgk:lang",()=>location.reload());</script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/kelola.js"></script>
+</body>
+</html>

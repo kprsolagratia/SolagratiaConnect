@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alkitab · SGKConnect</title>
+<meta name="theme-color" content="#102A43">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="ico-btn burger" aria-label="Buka menu" data-icon="menu"></button>
+      <label class="search"><span data-icon="search" data-size="17"></span>
+        <input id="q" type="search" placeholder="Cari kitab, pasal, atau kata…" aria-label="Cari ayat"></label>
+      <div class="spacer"></div>
+      <button class="ico-btn" data-lang-toggle style="font-family:Poppins;font-size:11.5px;font-weight:600">ID</button>
+      <button class="ico-btn" data-theme-toggle data-t-aria="umum.tema" aria-label="Ganti tema"></button>
+      <div class="avatar" data-scene="face"></div>
+    </header>
+
+    <section class="rise">
+      <div class="eyebrow" data-t="alkitab.eyebrow">Firman</div>
+      <h1 style="margin-top:8px" data-t="alkitab.judul">Alkitab &amp; renungan</h1>
+    </section>
+
+    <section class="grid hero-grid rise">
+      <article class="card">
+        <div class="row-b"><div class="lab" data-t="alkitab.renunganHariIni">Renungan hari ini</div><span class="chip" id="today"></span></div>
+        <h2 style="margin:12px 0 10px" id="rTitle"></h2>
+        <p class="font-display" style="font-size:15px;font-weight:400;line-height:1.7;color:var(--muted);
+           border-left:3px solid var(--gold);padding-left:16px" id="rQuote"></p>
+        <div class="ref" style="margin:10px 0 16px" id="rRef"></div>
+        <p style="font-size:14.5px;line-height:1.8" id="rBody"></p>
+        <div class="row wrap" style="margin-top:18px">
+          <button class="btn btn-navy" data-read="renungan-hari-ini">Tandai selesai</button>
+          <button class="btn btn-line" id="shareR" data-t="umum.bagikan">Bagikan</button>
+          <span class="chip" id="rAuthor"></span>
+        </div>
+      </article>
+
+      <div class="stack">
+        <article class="card">
+          <div class="row-b"><div class="lab" data-t="alkitab.rencana">Rencana baca 2026</div><b class="ref" id="planPct">65%</b></div>
+          <div class="prog"><i id="planBar" style="width:65%"></i></div>
+          <p class="small muted" style="margin-top:8px" id="planNote"></p>
+          <div class="hairline"></div>
+          <div class="lab" data-t="alkitab.tantangan">Tantangan 365 hari</div>
+          <div class="row wrap" style="margin-top:10px">
+            <span class="badge b-gold">Beruntun 30 hari</span><span class="badge b-ok">Konsisten</span>
+          </div>
+        </article>
+        <article class="card">
+          <div class="lab" data-t="alkitab.penanda">Penanda & sorotan</div>
+          <div id="marks" style="margin-top:12px"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="card rise">
+      <div class="row-b"><div class="lab" data-t="alkitab.bacaanTerjadwal">Bacaan terjadwal</div><span class="chip">Hari 236–238</span></div>
+      <div class="grid g3" style="margin-top:14px" id="plan"></div>
+    </section>
+
+    <section class="card rise">
+      <div class="lab" data-t="alkitab.bacaCepat">Baca cepat</div>
+      <div class="tabs" style="margin-top:12px">
+        <button class="tab on">Perjanjian Baru</button><button class="tab">Perjanjian Lama</button><button class="tab">Mazmur</button>
+      </div>
+      <div class="grid g4" style="margin-top:14px" id="books"></div>
+    </section>
+  </main>
+</div>
+<nav class="mobile-nav"></nav>
+
+<script src="assets/js/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>SGK_I18N.mulai();window.addEventListener("sgk:lang",()=>location.reload());</script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  SGK.shell('alkitab.html');
+
+  (async function () {
+    const me = await DB.auth.guard(); if (!me) return;
+    SGK.store.set('user', { name: me.full_name || 'Anggota', role: me.role === 'admin' ? 'Pengurus' : 'Pemuda', avatar: me.avatar_url || null });
+
+    today.textContent = new Date().toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long'});
+
+    const [r, progRaw, bacaanRaw] = await Promise.all([
+      DB.bible.devotionToday().catch(() => null),
+      DB.bible.myProgress().catch(() => null),
+      DB.bible.plan(3).catch(() => [])
+    ]);
+    if (r) {
+      rTitle.textContent = r.title;
+      rQuote.textContent = '"' + (r.verse_text || '') + '"';
+      rRef.textContent = r.verse_ref || '';
+      rBody.textContent = r.body || '';
+      rAuthor.textContent = r.author || 'Tim Renungan';
+      shareR.addEventListener('click', () => App.share(r.title + ' — ' + (r.verse_ref||'')));
+    }
+
+
+    const prog = { done: 0, total: 365, map: {}, ...(progRaw && !Array.isArray(progRaw) ? progRaw : {}) };
+    const pct = prog.total ? Math.round(prog.done / prog.total * 100) : 0;
+    planPct.textContent = pct + '%';
+    planBar.style.width = pct + '%';
+    planNote.textContent = prog.done + ' dari ' + prog.total + ' hari · sisa ' + (prog.total - prog.done) + ' hari';
+
+    marks.innerHTML = [['Mazmur 23:1','Sorotan emas'],['Roma 8:28','Penanda'],['Filipi 4:6-7','Sorotan emas']]
+      .map((m,i) => `${i?'<div class="hairline"></div>':''}<div class="row-b">
+        <div><h4 style="font-size:13.5px">${m[0]}</h4><p class="small muted">${m[1]}</p></div>
+        ${SGK.icon('mark',16)}</div>`).join('');
+
+    const bacaan = bacaanRaw || [];
+    plan.innerHTML = bacaan.length ? bacaan.map(b => `<article class="card" style="background:var(--gray)">
+        <div class="row-b"><span class="chip">Hari ${b.day}</span>
+        ${prog.map[b.day] ? '<span class="badge b-ok">Selesai</span>' : ''}</div>
+        <h4 style="margin:10px 0 6px">${b.passage}</h4>
+        <p class="verse" style="font-size:12.5px">"${b.snippet || ''}"</p>
+        <button class="btn btn-line btn-sm btn-full" style="margin-top:12px" data-read="${b.day}">Tandai selesai</button>
+      </article>`).join('')
+      : '<p class="small muted">Rencana baca belum diisi. Pengurus dapat menambahkannya di Kelola Konten.</p>';
+
+    books.innerHTML = ['Matius','Markus','Lukas','Yohanes','Kisah Para Rasul','Roma','1 Korintus','Efesus']
+      .map(b => `<button class="chip" style="justify-content:center;padding:12px">${b}</button>`).join('');
+
+    App.bindAll();
+    SGK.paintScenes();
+  })();
+</script>
+</body>
+</html>

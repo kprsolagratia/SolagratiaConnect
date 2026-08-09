@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Masuk · SGKConnect — GKKA-I Jemaat Sendawar</title>
+<meta name="description" content="SGKConnect (Sola Gratia Koinonia Connect) — aplikasi pemuda GKKA-I Jemaat Sendawar. Renungan harian, kegiatan, pokok doa, dan komunitas dalam satu tempat.">
+<meta name="theme-color" content="#102A43">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<meta property="og:title" content="SGKConnect — Sola Gratia Koinonia Connect">
+<meta property="og:description" content="Terhubung dalam Kasih, Bertumbuh dalam Firman, Berdampak bagi Dunia.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<button data-lang-toggle style="position:fixed;right:18px;top:18px;z-index:50;
+  width:40px;height:34px;border-radius:11px;background:rgba(255,255,255,.9);
+  border:1px solid var(--line);font-family:Poppins;font-size:12px;font-weight:600;
+  color:var(--navy);cursor:pointer">ID</button>
+<main class="auth">
+  <div class="auth-art" data-scene="worship">
+    <div class="glass">
+      <div class="eyebrow" style="color:#E8CD79">Efesus 2:8</div>
+      <p class="font-display" style="font-size:19px;margin-top:8px;line-height:1.45">
+        "Sebab karena kasih karunia kamu diselamatkan oleh iman."</p>
+    </div>
+  </div>
+
+  <div class="auth-form">
+    <div class="auth-inner rise">
+      <div id="logo" style="margin-bottom:28px"></div>
+
+      <h1 id="title" style="font-size:27px">Selamat datang kembali</h1>
+      <p class="muted small" id="sub" style="margin:8px 0 24px">Masuk untuk melihat renungan, kegiatan, dan pokok doa jemaat.</p>
+
+      <form id="loginForm" novalidate>
+        <div class="field" id="nameField" hidden>
+          <label for="nama">Nama lengkap</label>
+          <input id="nama" name="nama" type="text" autocomplete="name" placeholder="Theo Rakyan">
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="username" placeholder="theo@sendawar.id" required>
+        </div>
+        <div class="field">
+          <label for="pass">Kata sandi</label>
+          <input id="pass" name="pass" type="password" autocomplete="current-password" placeholder="••••••••" required>
+        </div>
+        <div class="row-b small" style="margin:4px 0 20px">
+          <label class="muted row" style="gap:7px"><input type="checkbox" checked style="width:auto"> Ingat saya</label>
+          <button type="button" class="ref" id="forgot" style="font-size:12px">Lupa sandi?</button>
+        </div>
+        <button class="btn btn-gold btn-full" type="submit" id="submitBtn">Masuk</button>
+      </form>
+      <p class="small" id="modeNote" style="margin-top:12px;text-align:center"></p>
+
+      <div class="row" style="margin:18px 0"><div class="hairline" style="flex:1;margin:0"></div>
+        <span class="small muted">atau</span><div class="hairline" style="flex:1;margin:0"></div></div>
+
+      <button class="btn btn-line btn-full" id="switchBtn">Buat akun baru</button>
+      <p class="small muted" style="text-align:center;margin-top:22px" id="guestWrap">
+        <a href="publik.html" class="ref" id="tamu" style="font-size:12px">Lihat tanpa masuk</a>
+      </p>
+      <p class="small muted" style="text-align:center;margin-top:26px;font-size:11px">
+        GKKA-I Jemaat Sendawar · <a href="konsep.html" style="text-decoration:underline">Konsep UI/UX</a>
+      </p>
+    </div>
+  </div>
+</main>
+
+<script src="assets/js/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>SGK_I18N.mulai();window.addEventListener("sgk:lang",()=>location.reload());</script>
+<script src="assets/js/db.js"></script>
+<script>
+  document.getElementById('logo').innerHTML = SGK.lockup(250);
+  SGK.paintScenes();
+  SGK.applyTheme(SGK.store.get('theme','light'));
+
+  let daftar = false;
+
+  if (!DB.live) {
+    modeNote.innerHTML = '<span style="color:var(--gold)">Mode demo</span> — belum tersambung ke database. ' +
+      'Isi <code>assets/js/config.js</code> untuk mengaktifkan akun sungguhan.';
+    modeNote.style.color = 'var(--muted)';
+  }
+  if (window.SGK_CONFIG && SGK_CONFIG.ALLOW_SIGNUP === false) switchBtn.hidden = true;
+
+  // sudah masuk? langsung ke beranda
+  DB.auth.session().then(s => { if (s) location.replace('beranda.html'); });
+
+  // Halaman publik memuat jadwal kegiatan, renungan, dan pengumuman —
+  // tanpa pokok doa dan data anggota. Berlaku di kedua mode.
+  const tamu = document.getElementById('tamu');
+  if (tamu && !DB.live) {
+    tamu.addEventListener('click', () => {
+      SGK.store.set('user', { name: DATA.profil.nama, role: 'Pemuda' });
+    });
+  }
+
+  switchBtn.addEventListener('click', () => {
+    daftar = !daftar;
+    nameField.hidden = !daftar;
+    title.textContent   = daftar ? 'Buat akun baru' : 'Selamat datang kembali';
+    sub.textContent     = daftar ? 'Daftarkan diri untuk bergabung dengan pemuda jemaat.'
+                                 : 'Masuk untuk melihat renungan, kegiatan, dan pokok doa jemaat.';
+    submitBtn.textContent = daftar ? 'Daftar' : 'Masuk';
+    switchBtn.textContent = daftar ? 'Sudah punya akun? Masuk' : 'Buat akun baru';
+    guestWrap.hidden = daftar;
+  });
+
+  forgot.addEventListener('click', async () => {
+    const e = email.value.trim();
+    if (!e) { SGK.toast('Isi email Anda dulu, lalu tekan "Lupa sandi?".'); return; }
+    await DB.auth.resetPassword(e);
+    SGK.toast('Tautan pemulihan dikirim ke ' + e);
+  });
+
+  document.getElementById('loginForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const em = email.value.trim(), pw = pass.value;
+    if (!em || !pw) { SGK.toast('Lengkapi email dan kata sandi.'); return; }
+    submitBtn.disabled = true;
+    submitBtn.textContent = daftar ? 'Mendaftarkan…' : 'Memproses…';
+    try {
+      if (daftar) {
+        const r = await DB.auth.signUp(em, pw, nama.value.trim() || em.split('@')[0]);
+        if (DB.live && r && r.user && !r.session) {
+          SGK.toast('Akun dibuat. Periksa email untuk konfirmasi.');
+          submitBtn.disabled = false; submitBtn.textContent = 'Daftar';
+          return;
+        }
+      } else {
+        await DB.auth.signIn(em, pw);
+      }
+      location.href = 'beranda.html';
+    } catch (err) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = daftar ? 'Daftar' : 'Masuk';
+    }
+  });
+</script>
+</body>
+</html>

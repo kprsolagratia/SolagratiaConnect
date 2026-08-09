@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SGKConnect — GKKA-I Jemaat Sendawar</title>
+<meta name="description" content="Jadwal kegiatan, renungan harian, dan pengumuman pemuda GKKA-I Jemaat Sendawar.">
+<meta name="theme-color" content="#102A43">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<meta property="og:title" content="SGKConnect — Sola Gratia Koinonia Connect">
+<meta property="og:description" content="Terhubung dalam Kasih, Bertumbuh dalam Firman, Berdampak bagi Dunia.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="assets/css/app.css">
+<style>
+  body{background:var(--bg)}
+  .pub{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+  .pub-top{
+    display:flex;align-items:center;gap:14px;padding:18px 0;position:sticky;top:0;z-index:30;
+    background:linear-gradient(180deg,var(--bg) 78%,transparent)
+  }
+  .pub-hero{
+    position:relative;height:300px;border-radius:26px;overflow:hidden;margin-bottom:26px;
+    box-shadow:var(--sh-lift)
+  }
+  .pub-hero .isi{position:absolute;left:32px;right:32px;bottom:30px;color:#fff;z-index:2}
+  .pub-hero h1{font-size:clamp(26px,4vw,40px);line-height:1.1;text-shadow:0 2px 24px rgba(0,0,0,.45)}
+  .pub-hero p{margin-top:10px;font-family:Poppins;font-weight:300;font-size:15px;color:rgba(255,255,255,.9);max-width:520px}
+  .sec{margin:38px 0}
+  .sec-h{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+  .foto-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .foto-grid a{aspect-ratio:4/3;border-radius:14px;overflow:hidden;position:relative;display:block;background:var(--gray)}
+  .foto-grid img{width:100%;height:100%;object-fit:cover;transition:transform .4s var(--ease)}
+  .foto-grid a:hover img{transform:scale(1.05)}
+  .pub-foot{
+    margin-top:50px;border-radius:26px;padding:34px;text-align:center;
+    background:linear-gradient(120deg,#0B1E33,#173B5E 55%,#0A1826);color:#fff
+  }
+  .pub-foot h3{font-size:26px;margin:14px 0 8px}
+  .pub-foot p{color:rgba(255,255,255,.72);font-family:Poppins;font-weight:300}
+  .catatan{
+    background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.3);
+    border-radius:14px;padding:14px 16px;font-size:13px;color:var(--ink);margin-top:20px
+  }
+  @media(max-width:860px){
+    .foto-grid{grid-template-columns:repeat(2,1fr)}
+    .pub-hero{height:230px}
+    .pub-hero .isi{left:20px;right:20px;bottom:20px}
+  }
+</style>
+</head>
+<body>
+<div class="pub">
+
+  <header class="pub-top">
+    <span id="logo"></span>
+    <div>
+      <div class="font-display" style="font-size:17px">SGK<span style="color:var(--gold)">Connect</span></div>
+      <div class="small muted" id="namaGereja">GKKA-I Jemaat Sendawar</div>
+    </div>
+    <div class="spacer" style="flex:1"></div>
+    <button class="ico-btn" data-lang-toggle style="font-family:Poppins;font-size:11.5px;font-weight:600">ID</button>
+    <button class="ico-btn" data-theme-toggle aria-label="Ganti tampilan"></button>
+    <a class="btn btn-gold" href="index.html">Masuk</a>
+  </header>
+
+  <section class="pub-hero rise">
+    <div id="heroArt" data-scene="worship" style="position:absolute;inset:0"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,30,51,.15) 40%,rgba(11,30,51,.78))"></div>
+    <div class="isi">
+      <div class="eyebrow" style="color:var(--gold-soft)">Pemuda Sola Gratia</div>
+      <h1 id="heroJudul">Rise Together,<br>Shine for Christ</h1>
+      <p id="heroTag">Terhubung dalam Kasih, Bertumbuh dalam Firman, Berdampak bagi Dunia.</p>
+    </div>
+  </section>
+
+  <!-- renungan & ayat -->
+  <section class="sec grid g2 rise" id="firman"></section>
+
+  <!-- kegiatan -->
+  <section class="sec rise">
+    <div class="sec-h">
+      <h2>Jadwal kegiatan</h2>
+      <a class="ref" style="font-size:13px" href="index.html">Masuk untuk mendaftar</a>
+    </div>
+    <div class="grid g3" id="kegiatan"></div>
+  </section>
+
+  <!-- galeri -->
+  <section class="sec rise" id="secGaleri" hidden>
+    <div class="sec-h"><h2>Dokumentasi kegiatan</h2></div>
+    <div class="foto-grid" id="galeri"></div>
+  </section>
+
+  <!-- media -->
+  <section class="sec rise" id="secMedia" hidden>
+    <div class="sec-h"><h2>Khotbah & podcast</h2></div>
+    <div class="grid g3" id="media"></div>
+  </section>
+
+  <!-- kelompok -->
+  <section class="sec rise">
+    <div class="sec-h"><h2>Kelompok sel & tim pelayanan</h2></div>
+    <div class="grid g4" id="kelompok"></div>
+  </section>
+
+  <!-- pengumuman -->
+  <section class="sec rise">
+    <div class="sec-h"><h2>Pengumuman</h2></div>
+    <div class="card" id="pengumuman"></div>
+  </section>
+
+  <footer class="pub-foot rise">
+    <div style="display:flex;justify-content:center" id="logoFoot"></div>
+    <h3 class="font-display">SGK<span style="color:var(--gold)">Connect</span></h3>
+    <p id="tagFoot">Connected in Christ. Growing in Faith. Serving with Love.</p>
+    <div style="margin-top:22px">
+      <a class="btn btn-gold" href="index.html">Masuk atau daftar</a>
+    </div>
+    <p style="font-size:12px;color:rgba(255,255,255,.5);margin-top:20px" id="infoGereja"></p>
+  </footer>
+
+  <p class="catatan">
+    Halaman ini terbuka untuk umum. Pokok doa, data anggota, dan catatan kehadiran
+    hanya bisa dilihat setelah masuk dengan akun jemaat.
+  </p>
+
+</div>
+
+<script src="assets/js/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/publik.js"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kegiatan · SGKConnect</title>
+<meta name="theme-color" content="#102A43">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="ico-btn burger" aria-label="Buka menu" data-icon="menu"></button>
+      <label class="search"><span data-icon="search" data-size="17"></span>
+        <input id="q" type="search" placeholder="Cari kegiatan…" aria-label="Cari kegiatan"></label>
+      <div class="spacer"></div>
+      <button class="ico-btn" data-lang-toggle style="font-family:Poppins;font-size:11.5px;font-weight:600">ID</button>
+      <button class="ico-btn" data-theme-toggle data-t-aria="umum.tema" aria-label="Ganti tema"></button>
+      <div class="avatar" data-scene="face"></div>
+    </header>
+
+    <section class="row-b wrap rise">
+      <div><div class="eyebrow" data-t="kegiatan.eyebrow">Agenda pemuda</div><h1 style="margin-top:8px" data-t="kegiatan.judul">Kegiatan</h1></div>
+      <button class="btn btn-gold" id="scanBtn">Check-in QR</button>
+    </section>
+
+    <div class="tabs rise" id="tabs">
+      <button class="tab on" data-f="all" data-t="kegiatan.semua">Semua</button>
+      <button class="tab" data-f="Ibadah">Ibadah</button>
+      <button class="tab" data-f="Retreat">Retreat</button>
+      <button class="tab" data-f="Fellowship">Fellowship</button>
+      <button class="tab" data-f="Pembinaan">Pembinaan</button>
+    </div>
+
+    <section class="grid g2 rise" id="list"></section>
+
+    <section class="grid g2 rise">
+      <article class="card">
+        <div class="lab">Lokasi kegiatan terdekat</div>
+        <h3 style="margin:8px 0 12px" id="mapTitle"></h3>
+        <div style="height:190px;border-radius:16px;overflow:hidden;border:1px solid var(--line)" data-scene="map"></div>
+        <a class="btn btn-line btn-full" style="margin-top:12px" id="mapLink" target="_blank" rel="noopener">Buka di Google Maps</a>
+      </article>
+      <article class="card">
+        <div class="lab" data-t="kegiatan.riwayatHadir">Riwayat kehadiran</div>
+        <div id="hist" style="margin-top:12px"></div>
+        <div class="hairline"></div>
+        <div class="row-b"><span class="small muted">Kehadiran 3 bulan terakhir</span><b id="pct">—</b></div>
+        <div class="prog"><i id="bar" style="width:0"></i></div>
+      </article>
+    </section>
+  </main>
+</div>
+<nav class="mobile-nav"></nav>
+
+<script src="assets/js/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>SGK_I18N.mulai();window.addEventListener("sgk:lang",()=>location.reload());</script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  SGK.shell('kegiatan.html');
+  scanBtn.innerHTML = SGK.icon('qr',17) + 'Check-in QR';
+
+  (async function () {
+    const me = await DB.auth.guard(); if (!me) return;
+    SGK.store.set('user', { name: me.full_name || 'Anggota', role: me.role === 'admin' ? 'Pengurus' : 'Pemuda', avatar: me.avatar_url || null });
+    const [evsRaw, hRaw] = await Promise.all([
+      DB.events.list().catch(() => []),
+      DB.events.myAttendance().catch(() => [])
+    ]);
+    const evs = evsRaw || [];
+
+    function card(e){
+      const tgl = e.date_text || new Date(e.starts_at)
+        .toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+      const kuota = e.capacity || 100, isi = e.going || 0;
+      return `<article class="card" data-cat="${e.category||''}" data-name="${e.title} ${e.location||''} ${e.category||''}" style="padding:0;overflow:hidden">
+        <div style="height:150px;position:relative" data-scene="${e.scene||'camp'}"></div>
+        <div style="padding:18px">
+          <div class="row-b"><span class="badge b-gold">${e.category||'Kegiatan'}</span>
+            <span class="chip">${isi}/${kuota} kursi</span></div>
+          <h3 style="margin:12px 0 6px">${e.title}</h3>
+          <p class="small muted">${tgl}</p>
+          <p class="small muted row" style="gap:6px;margin-top:6px">${SGK.icon('pin',14)}${e.location||'Lokasi menyusul'}</p>
+          <div class="count" data-cd="${e.starts_at}"></div>
+          <div class="prog" style="margin-bottom:14px"><i style="width:${Math.min(100,isi/kuota*100).toFixed(0)}%"></i></div>
+          <div class="row">
+            <button class="btn btn-gold" style="flex:1" data-rsvp="${e.id}">RSVP</button>
+            <button class="btn btn-navy" style="flex:1" data-scan="${e.id}" data-title="${e.title}">Check-in</button>
+          </div>
+        </div></article>`;
+    }
+    list.innerHTML = evs.map(card).join('') ||
+      '<p class="muted">Belum ada kegiatan terjadwal. Pengurus dapat menambahkannya lewat panel admin.</p>';
+
+    document.querySelectorAll('[data-cd]').forEach(el => SGK.countdown(el, el.dataset.cd));
+    document.querySelectorAll('[data-scan]').forEach(b =>
+      b.addEventListener('click', () => App.checkin(b.dataset.title, b.dataset.scan)));
+    if (evs[0]) scanBtn.addEventListener('click', () => App.checkin(evs[0].title, evs[0].id));
+
+    const ev = evs[0];
+    if (ev) {
+      mapTitle.textContent = ev.title + ' · ' + (ev.location || '');
+      mapLink.href = 'https://www.google.com/maps/search/?api=1&query=' +
+        encodeURIComponent(ev.map_query || ev.location || 'Sendawar');
+    }
+
+    const h = hRaw || [];
+    hist.innerHTML = h.length ? h.map((x,i) => `${i?'<div class="hairline"></div>':''}
+      <div class="row-b"><div><h4 style="font-size:13.5px">${x.judul}</h4>
+      <p class="small muted">${x.tgl}</p></div>
+      <span class="badge ${x.status==='Hadir'?'b-ok':'b-navy'}">${x.status}</span></div>`).join('')
+      : '<p class="small muted">Belum ada riwayat. Lakukan check-in QR saat menghadiri kegiatan.</p>';
+    const hadir = h.filter(x => x.status === 'Hadir').length;
+    const pctv = h.length ? Math.round(hadir / h.length * 100) : 0;
+    pct.textContent = pctv + '%'; bar.style.width = pctv + '%';
+
+    App.filter('#q', '#list .card');
+    tabs.addEventListener('click', e => {
+      const b = e.target.closest('.tab'); if(!b) return;
+      tabs.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t === b));
+      document.querySelectorAll('#list .card').forEach(c =>
+        c.style.display = (b.dataset.f === 'all' || c.dataset.cat === b.dataset.f) ? '' : 'none');
+    });
+    App.bindAll();
+    SGK.paintScenes();
+  })();
+</script>
+</body>
+</html>

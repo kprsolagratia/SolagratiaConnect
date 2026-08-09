@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Galeri · SGKConnect</title>
+<meta name="theme-color" content="#102A43">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<link rel="stylesheet" href="assets/css/app.css">
+<style>
+  .galeri{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .foto{
+    position:relative;aspect-ratio:4/3;border-radius:16px;overflow:hidden;
+    background:var(--gray);border:1px solid var(--line);cursor:pointer
+  }
+  .foto img{width:100%;height:100%;object-fit:cover;transition:transform .4s var(--ease)}
+  .foto:hover img{transform:scale(1.06)}
+  .foto .tirai{
+    position:absolute;inset:0;opacity:0;transition:opacity .25s;
+    background:linear-gradient(180deg,rgba(11,30,51,0) 45%,rgba(11,30,51,.82));
+    display:flex;flex-direction:column;justify-content:flex-end;padding:12px
+  }
+  .foto:hover .tirai,.foto.terpilih .tirai{opacity:1}
+  .foto .judul{color:#fff;font-family:Poppins;font-size:12.5px;font-weight:500;line-height:1.3}
+  .foto .tgl{color:rgba(255,255,255,.72);font-size:10.5px;margin-top:3px}
+  .foto .unduh{
+    position:absolute;right:10px;top:10px;width:34px;height:34px;border-radius:11px;
+    background:rgba(255,255,255,.92);display:grid;place-items:center;opacity:0;
+    transition:opacity .25s,transform .2s;color:var(--navy)
+  }
+  .foto:hover .unduh{opacity:1}
+  .foto .unduh:hover{transform:scale(1.08)}
+  .foto .centang{
+    position:absolute;left:10px;top:10px;width:26px;height:26px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.85);background:rgba(11,30,51,.35);
+    display:grid;place-items:center;opacity:0;transition:.2s
+  }
+  .foto:hover .centang,.pilih-aktif .foto .centang{opacity:1}
+  .foto.terpilih{outline:3px solid var(--gold);outline-offset:2px}
+  .foto.terpilih .centang{background:var(--gold);border-color:var(--gold);opacity:1}
+
+  /* penampil layar penuh */
+  .lihat{
+    position:fixed;inset:0;z-index:200;background:rgba(6,17,29,.94);
+    display:grid;place-items:center;padding:24px;opacity:0;pointer-events:none;transition:.25s
+  }
+  .lihat.show{opacity:1;pointer-events:auto}
+  .lihat img{max-width:100%;max-height:76vh;border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .lihat .bar{
+    position:absolute;left:0;right:0;bottom:0;padding:20px 24px calc(20px + env(safe-area-inset-bottom));
+    display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:#fff;
+    background:linear-gradient(180deg,transparent,rgba(6,17,29,.9))
+  }
+  .lihat .tutupX{position:absolute;right:20px;top:20px;width:42px;height:42px;border-radius:14px;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);color:#fff;display:grid;place-items:center}
+  .lihat .nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);color:#fff;display:grid;place-items:center}
+  .lihat .prev{left:18px} .lihat .next{right:18px}
+
+  .bilah{
+    position:sticky;bottom:0;z-index:40;margin-top:18px;padding:14px 18px;border-radius:16px;
+    background:var(--navy);color:#fff;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+    box-shadow:var(--sh-lift)
+  }
+  @media(max-width:1080px){.galeri{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:760px){
+    .galeri{grid-template-columns:repeat(2,1fr);gap:10px}
+    .foto .unduh,.foto .centang{opacity:1}
+    .lihat .nav{width:40px;height:40px}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="ico-btn burger" aria-label="Buka menu" data-icon="menu"></button>
+      <label class="search"><span data-icon="search" data-size="17"></span>
+        <input id="q" type="search" placeholder="Cari foto…" aria-label="Cari foto"></label>
+      <div class="spacer"></div>
+      <button class="ico-btn" data-lang-toggle style="font-family:Poppins;font-size:11.5px;font-weight:600">ID</button>
+      <button class="ico-btn" data-theme-toggle aria-label="Ganti tema"></button>
+      <div class="avatar" data-scene="face"></div>
+    </header>
+
+    <section class="row-b wrap rise">
+      <div>
+        <div class="eyebrow">Dokumentasi</div>
+        <h1 style="margin-top:8px">Galeri Foto</h1>
+        <p class="muted small" style="margin-top:8px" id="jumlah">Memuat…</p>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-line btn-sm" id="modePilih">Pilih beberapa</button>
+        <a class="btn btn-gold btn-sm" href="kelola.html" id="tambahFoto" hidden>+ Tambah foto</a>
+      </div>
+    </section>
+
+    <div class="tabs rise" id="tabs"></div>
+
+    <section class="galeri rise" id="galeri"></section>
+    <p class="muted rise" id="kosong" style="text-align:center;padding:50px 20px" hidden></p>
+
+    <div class="bilah rise" id="bilah" hidden>
+      <span id="terpilihKet" style="font-size:13.5px">0 foto dipilih</span>
+      <div class="spacer" style="flex:1"></div>
+      <button class="btn btn-line btn-sm" id="pilihSemua">Pilih semua</button>
+      <button class="btn btn-gold btn-sm" id="unduhTerpilih">Unduh</button>
+      <button class="btn btn-line btn-sm" id="batalPilih">Selesai</button>
+    </div>
+  </main>
+</div>
+<nav class="mobile-nav"></nav>
+
+<div class="lihat" id="lihat">
+  <button class="tutupX" id="tutupLihat" aria-label="Tutup" data-icon="x"></button>
+  <button class="nav prev" id="sebelum" aria-label="Sebelumnya">‹</button>
+  <button class="nav next" id="sesudah" aria-label="Berikutnya">›</button>
+  <img id="lihatImg" alt="">
+  <div class="bar">
+    <div style="flex:1;min-width:200px">
+      <div class="font-display" id="lihatJudul" style="font-size:16px"></div>
+      <div id="lihatKet" style="font-size:12.5px;color:rgba(255,255,255,.7);margin-top:3px"></div>
+    </div>
+    <button class="btn btn-gold btn-sm" id="unduhSatu">Unduh foto</button>
+  </div>
+</div>
+
+<script src="assets/js/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/galeri.js"></script>
+</body>
+</html>

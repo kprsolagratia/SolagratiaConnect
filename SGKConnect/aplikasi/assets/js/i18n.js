@@ -1,0 +1,531 @@
+/* ============================================================
+   SGKConnect — dua bahasa (Indonesia & English)
+   ------------------------------------------------------------
+   Pemakaian:
+     • HTML  : <h1 data-t="beranda.judul">Beranda</h1>
+     • JS    : SGK.t('beranda.judul')
+     • Ganti : SGK.setLang('en')
+
+   Isi dari database (kegiatan, renungan, pengumuman) TIDAK
+   diterjemahkan — ditulis pengurus dalam bahasa pilihan mereka.
+   ============================================================ */
+(function (w) {
+  'use strict';
+
+  const KAMUS = {
+    id: {
+      /* ---------- navigasi ---------- */
+      'nav.beranda': 'Beranda',
+      'nav.kegiatan': 'Kegiatan',
+      'nav.alkitab': 'Alkitab',
+      'nav.doa': 'Pokok Doa',
+      'nav.komunitas': 'Komunitas',
+      'nav.galeri': 'Galeri',
+      'nav.profil': 'Profil',
+      'nav.admin': 'Dasbor',
+      'nav.kelola': 'Kelola Konten',
+      'nav.keluar': 'Keluar',
+
+      /* ---------- umum ---------- */
+      'umum.cari': 'Cari…',
+      'umum.simpan': 'Simpan',
+      'umum.batal': 'Batal',
+      'umum.tambah': 'Tambah',
+      'umum.ubah': 'Ubah',
+      'umum.hapus': 'Hapus',
+      'umum.tutup': 'Tutup',
+      'umum.lihatSemua': 'Lihat semua',
+      'umum.selengkapnya': 'Baca selengkapnya',
+      'umum.bagikan': 'Bagikan',
+      'umum.kembali': 'Kembali',
+      'umum.memuat': 'Memuat…',
+      'umum.belumAda': 'Belum ada isinya',
+      'umum.tema': 'Ganti tampilan terang/gelap',
+      'umum.bahasa': 'Ganti bahasa',
+      'umum.menu': 'Buka menu',
+      'umum.notifikasi': 'Pemberitahuan',
+
+      /* ---------- masuk ---------- */
+      'masuk.judul': 'Selamat datang kembali',
+      'masuk.sub': 'Masuk untuk melihat renungan, kegiatan, dan pokok doa jemaat.',
+      'masuk.daftarJudul': 'Buat akun baru',
+      'masuk.daftarSub': 'Daftarkan diri untuk bergabung dengan pemuda jemaat.',
+      'masuk.nama': 'Nama lengkap',
+      'masuk.email': 'Email',
+      'masuk.sandi': 'Kata sandi',
+      'masuk.ingat': 'Ingat saya',
+      'masuk.lupa': 'Lupa sandi?',
+      'masuk.tombol': 'Masuk',
+      'masuk.daftarTombol': 'Daftar',
+      'masuk.atau': 'atau',
+      'masuk.buatAkun': 'Buat akun baru',
+      'masuk.sudahPunya': 'Sudah punya akun? Masuk',
+      'masuk.tamu': 'Lihat sebagai tamu',
+
+      /* ---------- beranda ---------- */
+      'beranda.pagi': 'Selamat pagi',
+      'beranda.siang': 'Selamat siang',
+      'beranda.sore': 'Selamat sore',
+      'beranda.malam': 'Selamat malam',
+      'beranda.kegiatanBerikut': 'Kegiatan terdekat',
+      'beranda.hari': 'Hari',
+      'beranda.jam': 'Jam',
+      'beranda.menit': 'Menit',
+      'beranda.ikut': 'Konfirmasi kehadiran',
+      'beranda.sudahIkut': 'Kehadiran tercatat',
+      'beranda.sudahDaftar': 'pemuda sudah mendaftar',
+      'beranda.belumAdaKegiatan': 'Belum ada kegiatan',
+      'beranda.agendaMenyusul': 'Agenda akan muncul di sini',
+      'beranda.renunganHariIni': 'Renungan hari ini',
+      'beranda.ayatMinggu': 'Ayat minggu ini',
+      'beranda.pokokDoa': 'Pokok doa',
+      'beranda.mendoakan': 'orang mendoakan',
+      'beranda.sayaDoakan': 'Saya mendoakan',
+      'beranda.belumAdaDoa': 'Belum ada pokok doa',
+      'beranda.jadiPertama': 'Jadilah yang pertama mengirim permohonan doa.',
+      'beranda.aksesCepat': 'Akses cepat',
+      'beranda.kalender': 'Kalender',
+      'beranda.fotoTerbaru': 'Dokumentasi terbaru',
+      'beranda.dengarkan': 'Podcast pilihan',
+      'beranda.ulangTahun': 'Ulang tahun',
+      'beranda.kirimUcapan': 'Kirim ucapan',
+      'beranda.pengumuman': 'Pengumuman',
+      'beranda.aktivitas': 'Aktivitas komunitas',
+      'beranda.checkin': 'Check-in',
+
+      /* ---------- kegiatan ---------- */
+      'kegiatan.judul': 'Kegiatan',
+      'kegiatan.eyebrow': 'Agenda pemuda',
+      'kegiatan.semua': 'Semua',
+      'kegiatan.akanDatang': 'Akan datang',
+      'kegiatan.riwayat': 'Riwayat',
+      'kegiatan.kursi': 'kursi',
+      'kegiatan.ikut': 'RSVP',
+      'kegiatan.lokasi': 'Lokasi kegiatan terdekat',
+      'kegiatan.bukaMaps': 'Buka di Google Maps',
+      'kegiatan.riwayatHadir': 'Riwayat kehadiran',
+      'kegiatan.hadir': 'Hadir',
+      'kegiatan.izin': 'Izin',
+      'kegiatan.persen': 'Kehadiran 3 bulan terakhir',
+      'kegiatan.belumHadir': 'Belum ada catatan. Pindai QR saat datang ke kegiatan.',
+
+      /* ---------- alkitab ---------- */
+      'alkitab.judul': 'Alkitab & renungan',
+      'alkitab.eyebrow': 'Firman',
+      'alkitab.renunganHariIni': 'Renungan hari ini',
+      'alkitab.tandaiSelesai': 'Tandai selesai',
+      'alkitab.selesai': 'Selesai dibaca',
+      'alkitab.rencana': 'Rencana baca 2026',
+      'alkitab.tantangan': 'Tantangan 365 hari',
+      'alkitab.beruntun': 'Beruntun 30 hari — pertahankan!',
+      'alkitab.penanda': 'Penanda & sorotan',
+      'alkitab.bacaanTerjadwal': 'Bacaan terjadwal',
+      'alkitab.bacaCepat': 'Baca cepat',
+      'alkitab.sisaHari': 'sisa hari',
+      'alkitab.dari': 'dari',
+      'alkitab.hari': 'hari',
+
+      /* ---------- doa ---------- */
+      'doa.judul': 'Pokok Doa',
+      'doa.eyebrow': 'Dinding doa jemaat',
+      'doa.sub': 'Setiap permohonan dibaca dan didoakan bersama. Kamu bisa mengirim tanpa nama.',
+      'doa.tambah': 'Tambah pokok doa',
+      'doa.judulIsian': 'Judul',
+      'doa.isiIsian': 'Permohonan',
+      'doa.anonim': 'Kirim sebagai anonim',
+      'doa.kirim': 'Kirim permohonan doa',
+      'doa.terbaru': 'Terbaru',
+      'doa.sayaDoakan': 'Saya mendoakan',
+      'doa.ayatPenguat': 'Ayat penguat',
+      'doa.statistik': 'Statistik doa',
+      'doa.bulanIni': 'Permohonan bulan ini',
+      'doa.kamuDoakan': 'Kamu doakan',
+      'doa.jadwalDoa': 'Jadwal doa bersama',
+      'doa.pesanPenguat': 'Pesan penguatan terbaru',
+      'doa.kirimPesan': 'Kirim pesan penguatan…',
+      'doa.tinjau': 'Terbit setelah ditinjau pengurus',
+
+      /* ---------- komunitas ---------- */
+      'komunitas.judul': 'Komunitas',
+      'komunitas.eyebrow': 'Koinonia',
+      'komunitas.sub': 'Bertumbuh bersama dalam kelompok sel, tim pelayanan, dan diskusi.',
+      'komunitas.kelompokSel': 'Kelompok sel',
+      'komunitas.timPelayanan': 'Tim pelayanan',
+      'komunitas.gabung': 'Gabung kelompok',
+      'komunitas.daftarLayan': 'Daftar melayani',
+      'komunitas.terkirim': 'Permintaan terkirim',
+      'komunitas.pemimpin': 'Pemimpin',
+      'komunitas.anggota': 'anggota',
+      'komunitas.forum': 'Forum diskusi',
+      'komunitas.buatTopik': 'Buat topik',
+      'komunitas.balasan': 'balasan',
+      'komunitas.pengumuman': 'Pengumuman gereja',
+      'komunitas.galeri': 'Galeri & media',
+      'komunitas.bukaGaleri': 'Buka galeri',
+      'komunitas.streaming': 'Streaming',
+
+      /* ---------- profil ---------- */
+      'profil.judul': 'Profil',
+      'profil.eyebrow': 'Kartu anggota digital',
+      'profil.kehadiran': 'Kehadiran',
+      'profil.bacaan': 'Baca Alkitab',
+      'profil.doa': 'Doa didukung',
+      'profil.lencana': 'Lencana',
+      'profil.pencapaian': 'Pencapaian',
+      'profil.belumLencana': 'Lencana akan muncul seiring keaktifanmu.',
+      'profil.progres': 'Progres iman',
+      'profil.aksiCepat': 'Aksi cepat',
+      'profil.tampilkanQR': 'Tampilkan QR',
+      'profil.ubahProfil': 'Ubah profil',
+      'profil.riwayat': 'Riwayat kehadiran',
+      'profil.doaDidukung': 'Doa yang kamu dukung',
+      'profil.pengaturan': 'Pengaturan',
+      'profil.aktif': 'Aktif',
+      'profil.nonaktif': 'Nonaktif',
+      'profil.belumRiwayat': 'Belum ada catatan kehadiran.',
+      'profil.belumDoa': 'Belum ada. Buka Pokok Doa dan tekan "Saya mendoakan".',
+
+      /* ---------- ringkasan (admin) ---------- */
+      'admin.judul': 'Dasbor',
+      'admin.eyebrow': 'Panel pengurus',
+      'admin.totalAnggota': 'Total anggota',
+      'admin.terdaftar': 'terdaftar di sistem',
+      'admin.kegiatanMendatang': 'Kegiatan mendatang',
+      'admin.dalamAgenda': 'dalam agenda',
+      'admin.pokokDoa': 'Pokok doa',
+      'admin.terbit': 'terbit di dinding doa',
+      'admin.hadir7': 'Hadir 7 hari terakhir',
+      'admin.checkinTercatat': 'check-in tercatat',
+      'admin.grafikKehadiran': 'Grafik kehadiran',
+      'admin.sebaran': 'Sebaran kelompok sel',
+      'admin.pendaftar': 'Pendaftar per kegiatan',
+      'admin.daftarAnggota': 'Daftar anggota',
+      'admin.nama': 'Nama',
+      'admin.noAnggota': 'No. anggota',
+      'admin.bergabung': 'Bergabung',
+      'admin.peran': 'Peran',
+      'admin.peranUbah': 'Peran (bisa diubah)',
+      'admin.moderasi': 'Pokok doa masuk',
+      'admin.progresBaca': 'Progres baca jemaat',
+      'admin.laporan': 'Laporan',
+      'admin.unduhCSV': 'Ekspor CSV',
+      'admin.cetak': 'Ekspor PDF',
+      'admin.kelolaIsi': 'Kelola Konten',
+      'admin.orang': 'orang',
+      'admin.belumAnggota': 'Belum ada yang mendaftar.',
+      'admin.belumKegiatan': 'Belum ada kegiatan terjadwal.',
+      'admin.belumHadir': 'Belum ada kehadiran tercatat',
+      'admin.khususPengurus': 'Halaman khusus pengurus',
+      'admin.tidakBerhak': 'Akunmu belum memiliki akses ke panel admin. Hubungi pengurus jemaat bila ini keliru.',
+
+      /* ---------- kelola isi ---------- */
+      'kelola.judul': 'Kelola Konten',
+      'kelola.sub': 'Tambah, ubah, dan hapus isi aplikasi tanpa membuka database.',
+      'kelola.tabKegiatan': 'Kegiatan',
+      'kelola.tabRenungan': 'Renungan',
+      'kelola.tabPengumuman': 'Pengumuman',
+      'kelola.tabKelompok': 'Kelompok & Tim',
+      'kelola.tabBacaan': 'Rencana Baca',
+      'kelola.tabGaleri': 'Galeri Foto',
+      'kelola.tabMedia': 'Video & Podcast',
+      'kelola.tabDoa': 'Moderasi Doa',
+      'kelola.tabTampilan': 'Tampilan & Identitas',
+      'kelola.tabPersetujuan': 'Persetujuan Anggota',
+      'kelola.tabHadir': 'Kehadiran Manual',
+      'kelola.aksi': 'Aksi',
+      'kelola.terbitkan': 'Terbitkan',
+      'kelola.arsipkan': 'Arsipkan',
+      'kelola.setujui': 'Setujui',
+      'kelola.tolak': 'Tolak',
+      'kelola.tandaiHadir': 'Tandai hadir',
+      'kelola.sudahHadir': 'Sudah hadir',
+
+      /* ---------- pesan ---------- */
+      'pesan.tersimpan': 'Sudah tersimpan.',
+      'pesan.terhapus': 'Sudah dihapus.',
+      'pesan.wajib': 'wajib diisi.',
+      'pesan.doaTerkirim': 'Permohonan terkirim. Kami mendoakan bersamamu.',
+      'pesan.terimaKasihDoa': 'Terima kasih sudah mendoakan.',
+      'pesan.hadirTercatat': 'Kehadiranmu dicatat. Sampai jumpa!',
+      'pesan.hadirBatal': 'Konfirmasi kehadiran dibatalkan.',
+      'pesan.bacaanSelesai': 'Bacaan selesai. Progres tersimpan.',
+      'pesan.modeDemo': 'Mode demo — perubahan tidak tersimpan.'
+    },
+
+    en: {
+      'nav.beranda': 'Home',
+      'nav.kegiatan': 'Events',
+      'nav.alkitab': 'Bible',
+      'nav.doa': 'Prayer',
+      'nav.komunitas': 'Community',
+      'nav.galeri': 'Gallery',
+      'nav.profil': 'Profile',
+      'nav.admin': 'Overview',
+      'nav.kelola': 'Manage',
+      'nav.keluar': 'Sign out',
+
+      'umum.cari': 'Search…',
+      'umum.simpan': 'Save',
+      'umum.batal': 'Cancel',
+      'umum.tambah': 'Add',
+      'umum.ubah': 'Edit',
+      'umum.hapus': 'Delete',
+      'umum.tutup': 'Close',
+      'umum.lihatSemua': 'See all',
+      'umum.selengkapnya': 'Read more',
+      'umum.bagikan': 'Share',
+      'umum.kembali': 'Back',
+      'umum.memuat': 'Just a moment…',
+      'umum.belumAda': 'Nothing here yet',
+      'umum.tema': 'Switch light/dark',
+      'umum.bahasa': 'Change language',
+      'umum.menu': 'Open menu',
+      'umum.notifikasi': 'Notifications',
+
+      'masuk.judul': 'Welcome back',
+      'masuk.sub': 'Sign in for devotions, events, and the church prayer wall.',
+      'masuk.daftarJudul': 'Create an account',
+      'masuk.daftarSub': 'Join the youth community of our church.',
+      'masuk.nama': 'Full name',
+      'masuk.email': 'Email',
+      'masuk.sandi': 'Password',
+      'masuk.ingat': 'Remember me',
+      'masuk.lupa': 'Forgot password?',
+      'masuk.tombol': 'Sign in',
+      'masuk.daftarTombol': 'Sign up',
+      'masuk.atau': 'or',
+      'masuk.buatAkun': 'Create an account',
+      'masuk.sudahPunya': 'Already have an account? Sign in',
+      'masuk.tamu': 'Just have a look',
+
+      'beranda.pagi': 'Good morning',
+      'beranda.siang': 'Good afternoon',
+      'beranda.sore': 'Good evening',
+      'beranda.malam': 'Good evening',
+      'beranda.kegiatanBerikut': 'Coming up next',
+      'beranda.hari': 'Days',
+      'beranda.jam': 'Hours',
+      'beranda.menit': 'Minutes',
+      'beranda.ikut': "I'm coming",
+      'beranda.sudahIkut': "You're on the list",
+      'beranda.sudahDaftar': 'already signed up',
+      'beranda.belumAdaKegiatan': 'No events yet',
+      'beranda.agendaMenyusul': 'Upcoming events will appear here',
+      'beranda.renunganHariIni': "Today's devotion",
+      'beranda.ayatMinggu': 'Verse of the week',
+      'beranda.pokokDoa': 'Prayer request',
+      'beranda.mendoakan': 'people praying',
+      'beranda.sayaDoakan': "I'm praying",
+      'beranda.belumAdaDoa': 'No prayer requests yet',
+      'beranda.jadiPertama': 'Be the first to share one.',
+      'beranda.aksesCepat': 'Quick open',
+      'beranda.kalender': 'Calendar',
+      'beranda.fotoTerbaru': 'Recent photos',
+      'beranda.dengarkan': 'Worth a listen',
+      'beranda.ulangTahun': 'Birthdays',
+      'beranda.kirimUcapan': 'Send wishes',
+      'beranda.pengumuman': 'Announcements',
+      'beranda.aktivitas': "What's happening",
+      'beranda.checkin': 'Check in',
+
+      'kegiatan.judul': 'Events',
+      'kegiatan.eyebrow': 'Youth calendar',
+      'kegiatan.semua': 'All',
+      'kegiatan.akanDatang': 'Upcoming',
+      'kegiatan.riwayat': 'Past',
+      'kegiatan.kursi': 'spots taken',
+      'kegiatan.ikut': "I'm coming",
+      'kegiatan.lokasi': 'Where the next one is',
+      'kegiatan.bukaMaps': 'Open in Google Maps',
+      'kegiatan.riwayatHadir': 'Your attendance',
+      'kegiatan.hadir': 'Present',
+      'kegiatan.izin': 'Excused',
+      'kegiatan.persen': 'Last three months',
+      'kegiatan.belumHadir': 'Nothing yet. Scan the QR when you arrive.',
+
+      'alkitab.judul': 'Bible & devotions',
+      'alkitab.eyebrow': 'The Word',
+      'alkitab.renunganHariIni': "Today's devotion",
+      'alkitab.tandaiSelesai': 'Mark as read',
+      'alkitab.selesai': 'Read',
+      'alkitab.rencana': 'Yearly reading plan',
+      'alkitab.tantangan': '365-day challenge',
+      'alkitab.beruntun': '30-day streak — keep going!',
+      'alkitab.penanda': 'Your bookmarks',
+      'alkitab.bacaanTerjadwal': "Today's reading",
+      'alkitab.bacaCepat': 'Open a book',
+      'alkitab.sisaHari': 'days to go',
+      'alkitab.dari': 'of',
+      'alkitab.hari': 'days',
+
+      'doa.judul': 'Prayer Wall',
+      'doa.eyebrow': 'Praying together',
+      'doa.sub': 'Every request is read and prayed for. You may send it without your name.',
+      'doa.tambah': 'Share a request',
+      'doa.judulIsian': 'What would you like prayer for?',
+      'doa.isiIsian': 'Tell us briefly',
+      'doa.anonim': 'Send without my name',
+      'doa.kirim': 'Send request',
+      'doa.terbaru': 'Latest',
+      'doa.sayaDoakan': "I'm praying for",
+      'doa.ayatPenguat': 'A verse for you',
+      'doa.statistik': 'Prayer notes',
+      'doa.bulanIni': 'Requests this month',
+      'doa.kamuDoakan': 'You pray for',
+      'doa.jadwalDoa': 'Praying together',
+      'doa.pesanPenguat': 'Words of encouragement',
+      'doa.kirimPesan': 'Write something encouraging…',
+      'doa.tinjau': 'Published after a leader reviews it',
+
+      'komunitas.judul': 'Community',
+      'komunitas.eyebrow': 'Koinonia',
+      'komunitas.sub': 'Growing together in small groups, ministry teams, and conversation.',
+      'komunitas.kelompokSel': 'Small groups',
+      'komunitas.timPelayanan': 'Ministry teams',
+      'komunitas.gabung': 'Join this group',
+      'komunitas.daftarLayan': 'Join this team',
+      'komunitas.terkirim': 'Request sent',
+      'komunitas.pemimpin': 'Led by',
+      'komunitas.anggota': 'members',
+      'komunitas.forum': 'Conversations',
+      'komunitas.buatTopik': 'Start a topic',
+      'komunitas.balasan': 'replies',
+      'komunitas.pengumuman': 'Church announcements',
+      'komunitas.galeri': 'Photos & video',
+      'komunitas.bukaGaleri': 'See all photos',
+      'komunitas.streaming': 'Watch the service',
+
+      'profil.judul': 'Profile',
+      'profil.eyebrow': 'Member card',
+      'profil.kehadiran': 'Attendance',
+      'profil.bacaan': 'Bible reading',
+      'profil.doa': 'Prayers supported',
+      'profil.lencana': 'Badges',
+      'profil.pencapaian': 'Your milestones',
+      'profil.belumLencana': 'Badges appear as you take part.',
+      'profil.progres': 'Your journey',
+      'profil.aksiCepat': 'Quick actions',
+      'profil.tampilkanQR': 'Show my card',
+      'profil.ubahProfil': 'Edit profile',
+      'profil.riwayat': 'Attendance history',
+      'profil.doaDidukung': "Prayers you're supporting",
+      'profil.pengaturan': 'Settings',
+      'profil.aktif': 'On',
+      'profil.nonaktif': 'Off',
+      'profil.belumRiwayat': 'No attendance recorded yet.',
+      'profil.belumDoa': 'None yet. Open Prayer Wall and tap the praying button.',
+
+      'admin.judul': 'Overview',
+      'admin.eyebrow': 'Leaders area',
+      'admin.totalAnggota': 'Members',
+      'admin.terdaftar': 'registered in the app',
+      'admin.kegiatanMendatang': 'Upcoming events',
+      'admin.dalamAgenda': 'on the calendar',
+      'admin.pokokDoa': 'Prayer requests',
+      'admin.terbit': 'live on the wall',
+      'admin.hadir7': 'Attended last 7 days',
+      'admin.checkinTercatat': 'check-ins recorded',
+      'admin.grafikKehadiran': 'Attendance by month',
+      'admin.sebaran': 'Members per group',
+      'admin.pendaftar': 'Sign-ups per event',
+      'admin.daftarAnggota': 'Member list',
+      'admin.nama': 'Name',
+      'admin.noAnggota': 'Member no.',
+      'admin.bergabung': 'Joined',
+      'admin.peran': 'Role',
+      'admin.peranUbah': 'Role (editable)',
+      'admin.moderasi': 'Incoming requests',
+      'admin.progresBaca': 'Average reading progress',
+      'admin.laporan': 'Reports',
+      'admin.unduhCSV': 'Download for Excel',
+      'admin.cetak': 'Print / save as PDF',
+      'admin.kelolaIsi': 'Manage content',
+      'admin.orang': 'people',
+      'admin.belumAnggota': 'Nobody has signed up yet.',
+      'admin.belumKegiatan': 'No events scheduled yet.',
+      'admin.belumHadir': 'No attendance recorded yet',
+      'admin.khususPengurus': 'Leaders only',
+      'admin.tidakBerhak': "Your account doesn't have access yet. Ask a church leader if this looks wrong.",
+
+      'kelola.judul': 'Manage Content',
+      'kelola.sub': 'Update the app without touching the database.',
+      'kelola.tabKegiatan': 'Events',
+      'kelola.tabRenungan': 'Devotions',
+      'kelola.tabPengumuman': 'Announcements',
+      'kelola.tabKelompok': 'Groups & Teams',
+      'kelola.tabBacaan': 'Reading Plan',
+      'kelola.tabGaleri': 'Photos',
+      'kelola.tabMedia': 'Video & Podcast',
+      'kelola.tabDoa': 'Incoming Prayers',
+      'kelola.tabTampilan': 'App Appearance',
+      'kelola.tabPersetujuan': 'Join Requests',
+      'kelola.tabHadir': 'Record Attendance',
+      'kelola.aksi': 'Actions',
+      'kelola.terbitkan': 'Publish',
+      'kelola.arsipkan': 'Archive',
+      'kelola.setujui': 'Accept',
+      'kelola.tolak': 'Decline',
+      'kelola.tandaiHadir': 'Mark present',
+      'kelola.sudahHadir': 'Recorded',
+
+      'pesan.tersimpan': 'Saved.',
+      'pesan.terhapus': 'Deleted.',
+      'pesan.wajib': 'is required.',
+      'pesan.doaTerkirim': "Your request was sent. We're praying with you.",
+      'pesan.terimaKasihDoa': 'Thank you for praying.',
+      'pesan.hadirTercatat': "You're on the list. See you there!",
+      'pesan.hadirBatal': 'Sign-up cancelled.',
+      'pesan.bacaanSelesai': 'Reading done. Your progress is saved.',
+      'pesan.modeDemo': 'Preview mode — changes are not saved.'
+    }
+  };
+
+  let lang = 'id';
+
+  function t(kunci, bawaan) {
+    const k = KAMUS[lang] && KAMUS[lang][kunci];
+    if (k) return k;
+    const id = KAMUS.id[kunci];
+    return id || bawaan || kunci;
+  }
+
+  /** Terapkan terjemahan ke seluruh elemen ber-atribut data-t. */
+  function terapkan(root) {
+    (root || document).querySelectorAll('[data-t]').forEach(el => {
+      const teks = t(el.dataset.t);
+      if (el.dataset.tAttr) el.setAttribute(el.dataset.tAttr, teks);
+      else el.textContent = teks;
+    });
+    (root || document).querySelectorAll('[data-t-ph]').forEach(el => {
+      el.setAttribute('placeholder', t(el.dataset.tPh));
+    });
+    (root || document).querySelectorAll('[data-t-aria]').forEach(el => {
+      el.setAttribute('aria-label', t(el.dataset.tAria));
+    });
+    document.documentElement.lang = lang;
+  }
+
+  function setLang(baru, muatUlang) {
+    lang = KAMUS[baru] ? baru : 'id';
+    try { localStorage.setItem('sgk:lang', JSON.stringify(lang)); } catch (e) {}
+    terapkan();
+    document.querySelectorAll('[data-lang-toggle]').forEach(b => {
+      b.textContent = lang === 'id' ? 'EN' : 'ID';
+      b.setAttribute('aria-label', t('umum.bahasa'));
+    });
+    if (muatUlang !== false) window.dispatchEvent(new CustomEvent('sgk:lang', { detail: lang }));
+  }
+
+  function mulai() {
+    // Bawaan selalu Bahasa Indonesia. Bahasa Inggris hanya bila dipilih pengguna.
+    let simpan = 'id';
+    try { simpan = JSON.parse(localStorage.getItem('sgk:lang')) || 'id'; } catch (e) {}
+    setLang(simpan, false);
+    document.addEventListener('click', e => {
+      const b = e.target.closest('[data-lang-toggle]');
+      if (b) { e.preventDefault(); setLang(lang === 'id' ? 'en' : 'id'); }
+    });
+  }
+
+  w.SGK_I18N = { t, setLang, terapkan, mulai, get lang() { return lang; }, KAMUS };
+})(window);

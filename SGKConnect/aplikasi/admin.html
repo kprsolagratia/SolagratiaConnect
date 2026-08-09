@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin · SGKConnect</title>
+<meta name="theme-color" content="#102A43">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="ico-btn burger" aria-label="Buka menu" data-icon="menu"></button>
+      <label class="search"><span data-icon="search" data-size="17"></span>
+        <input id="q" type="search" placeholder="Cari anggota…" aria-label="Cari anggota"></label>
+      <div class="spacer"></div>
+      <button class="ico-btn" data-lang-toggle style="font-family:Poppins;font-size:11.5px;font-weight:600">ID</button>
+      <button class="ico-btn" data-theme-toggle data-t-aria="umum.tema" aria-label="Ganti tema"></button>
+      <div class="avatar" data-scene="face"></div>
+    </header>
+
+    <section class="row-b wrap rise">
+      <div><div class="eyebrow" data-t="admin.eyebrow">Panel pengurus</div><h1 style="margin-top:8px" data-t="admin.judul">Dasbor</h1></div>
+      <div class="row wrap">
+        <a class="btn btn-gold btn-sm" href="kelola.html" data-t="admin.kelolaIsi">Kelola Konten</a>
+        <button class="btn btn-line btn-sm" id="pdfBtn" data-t="admin.cetak">Ekspor PDF</button>
+        <button class="btn btn-line btn-sm" id="xlsBtn" data-t="admin.unduhCSV">Ekspor CSV</button>
+      </div>
+    </section>
+
+    <section class="grid g4 rise" id="kpi"></section>
+
+    <section class="grid g3 rise">
+      <article class="card">
+        <div class="row-b"><div class="lab" data-t="admin.grafikKehadiran">Grafik kehadiran</div><span class="chip">Jan–Jul 2026</span></div>
+        <div id="line" style="margin-top:10px"></div>
+      </article>
+      <article class="card">
+        <div class="lab" data-t="admin.sebaran">Sebaran kelompok sel</div>
+        <div class="row" style="gap:16px;margin-top:10px;align-items:center">
+          <div id="donut"></div>
+          <div class="stack" style="gap:8px" id="legend"></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="lab" data-t="admin.pendaftar">Pendaftar per kegiatan</div>
+        <div id="bars" style="margin-top:14px"></div>
+      </article>
+    </section>
+
+    <section class="grid hero-grid rise">
+      <article class="card">
+        <div class="row-b"><div class="lab" data-t="admin.daftarAnggota">Daftar anggota</div><span class="chip" id="memCount"></span></div>
+        <div style="overflow-x:auto;margin-top:12px">
+          <table style="width:100%;border-collapse:collapse;font-size:13px" id="tbl">
+            <thead><tr>
+              <th style="text-align:left;padding:10px 8px" class="lab">Nama</th>
+              <th style="text-align:left;padding:10px 8px" class="lab">No. Anggota</th>
+              <th style="text-align:left;padding:10px 8px" class="lab">Bergabung</th>
+              <th style="text-align:left;padding:10px 8px" class="lab">Peran (bisa diubah)</th>
+            </tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <div class="stack">
+        <article class="card">
+          <div class="lab">Moderasi pokok doa</div>
+          <div id="mod" style="margin-top:12px"></div>
+        </article>
+        <article class="card">
+          <div class="lab">Progres baca jemaat</div>
+          <div class="row-b small" style="margin-top:12px"><span>Rata-rata target 365 hari</span><b>65%</b></div>
+          <div class="prog"><i style="width:65%"></i></div>
+          <p class="small muted" style="margin-top:8px">236 dari 365 hari · 168 anggota aktif membaca</p>
+          <div class="hairline"></div>
+          <div class="lab">Laporan siap kirim</div>
+          <div class="row" style="margin-top:12px">
+            <button class="btn btn-navy btn-sm" style="flex:1" id="repBtn">Laporan bulanan</button>
+            <button class="btn btn-line btn-sm" style="flex:1" id="annBtn">Kirim pengumuman</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+</div>
+<nav class="mobile-nav"></nav>
+
+<script src="assets/js/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>SGK_I18N.mulai();window.addEventListener("sgk:lang",()=>location.reload());</script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  SGK.shell('admin.html');
+
+  let members = [];
+
+  (async function () {
+    const me = await DB.auth.guard(); if (!me) return;
+    SGK.store.set('user', { name: me.full_name || 'Anggota', role: me.role === 'admin' ? 'Pengurus' : 'Pemuda', avatar: me.avatar_url || null });
+
+    if (DB.live && me.role !== 'admin' && me.role !== 'leader') {
+      document.querySelector('.main').innerHTML =
+        '<div class="card" style="margin-top:40px;text-align:center;padding:40px">' +
+        '<h2>Halaman khusus pengurus</h2>' +
+        '<p class="muted" style="margin:12px 0 20px">Akunmu belum memiliki akses ke panel admin. ' +
+        'Hubungi pengurus jemaat bila ini keliru.</p>' +
+        '<a class="btn btn-gold" href="beranda.html">Kembali ke beranda</a></div>';
+      return;
+    }
+
+    const [s_, ch, cellsRaw, evsRaw, membersRaw, doaRaw] = await Promise.all([
+      DB.stats.overview().catch(() => ({})),
+      DB.stats.attendanceByMonth().catch(() => ({labels:[],values:[]})),
+      DB.community.groups('cell').catch(() => []),
+      DB.events.list().catch(() => []),
+      DB.stats.members(100).catch(() => []),
+      DB.prayers.list().catch(() => [])
+    ]);
+    kpi.innerHTML = [
+      ['Total anggota', s_.anggota, 'terdaftar di sistem', 'var(--muted)'],
+      ['Kegiatan mendatang', s_.kegiatanAktif, 'dalam agenda', 'var(--muted)'],
+      ['Pokok doa', s_.doaMasuk, 'terbit di dinding doa', 'var(--muted)'],
+      ['Hadir 7 hari terakhir', s_.hadirMingguIni, 'check-in tercatat', 'var(--ok)']
+    ].map(([l,v,n,c]) => `<article class="card stat"><div class="lab">${l}</div><b>${v ?? 0}</b>
+        <i style="font-style:normal;font-size:11.5px;color:${c}">${n}</i></article>`).join('');
+
+
+    SGK.lineChart(line, ch.values.length ? ch.values : [0,0,0,0,0,0,0], ch.labels);
+
+    const cells = (cellsRaw || []).slice(0,4);
+    const total = cells.reduce((a,g) => a + (g.members||0), 0);
+    const warna = ['#102A43','#D4AF37','#3E7CB1','#9FB6CC'];
+    if (total > 0) {
+      const segs = cells.map((g,i) => [Math.round((g.members||0)/total*100), warna[i]]);
+      SGK.donut(donut, segs, total, 'ANGGOTA');
+      legend.innerHTML = cells.map((g,i) => `<div class="row small" style="gap:8px">
+          <i style="width:9px;height:9px;border-radius:3px;background:${warna[i]};display:block"></i>
+          ${g.name} · ${g.members||0} orang</div>`).join('');
+    } else {
+      SGK.donut(donut, [[100,'#E4EAF1']], '0', 'ANGGOTA');
+      legend.innerHTML = cells.length
+        ? cells.map((g,i) => `<div class="row small" style="gap:8px">
+            <i style="width:9px;height:9px;border-radius:3px;background:${warna[i]};display:block"></i>
+            ${g.name} · belum ada anggota</div>`).join('')
+          + '<p class="small muted" style="margin-top:8px">Anggota bergabung lewat halaman Komunitas, lalu disetujui pengurus.</p>'
+        : '<p class="small muted">Belum ada kelompok sel.</p>';
+    }
+
+    const evs = evsRaw || [];
+    if (evs.length) SGK.bars(bars, evs.slice(0,5).map(e => [e.title, e.going || 0]));
+    else bars.innerHTML = '<p class="small muted">Belum ada kegiatan terjadwal.</p>';
+
+    members = membersRaw || [];
+    memCount.textContent = (s_.anggota ?? members.length) + ' terdaftar';
+
+    const PERAN = { member:'Anggota', leader:'Pemimpin', admin:'Pengurus' };
+
+    function barisAnggota(m) {
+      const sendiri = m.id === me.id;
+      return `<tr data-name="${m.full_name} ${m.member_no||''}" style="border-top:1px solid var(--line)">
+        <td style="padding:11px 8px">${m.full_name}${sendiri?' <span class="small muted">(Anda)</span>':''}</td>
+        <td style="padding:11px 8px" class="muted">${m.member_no || '—'}</td>
+        <td style="padding:11px 8px" class="muted">${new Date(m.joined_at).toLocaleDateString('id-ID')}</td>
+        <td style="padding:9px 8px">
+          <select data-role="${m.id}" data-nama="${m.full_name}" data-semula="${m.role}"
+            aria-label="Peran ${m.full_name}"
+            style="padding:6px 10px;border-radius:9px;border:1px solid var(--line);
+                   background:var(--surface);color:var(--ink);font:inherit;font-size:12.5px">
+            ${Object.entries(PERAN).map(([k,v]) =>
+              `<option value="${k}"${m.role===k?' selected':''}>${v}</option>`).join('')}
+          </select>
+        </td></tr>`;
+    }
+
+    rows.innerHTML = members.length ? members.map(barisAnggota).join('')
+      : '<tr><td colspan="4" style="padding:16px" class="muted">Belum ada anggota terdaftar.</td></tr>';
+
+    rows.addEventListener('change', async e => {
+      const sel = e.target.closest('[data-role]'); if (!sel) return;
+      const id = sel.dataset.role, nama = sel.dataset.nama;
+      const semula = sel.dataset.semula, baru = sel.value;
+      if (semula === baru) return;
+
+      // jangan sampai tidak ada pengurus tersisa
+      if (['admin','leader'].includes(semula) && baru === 'member') {
+        const jml = await DB.stats.adminCount();
+        if (jml <= 1) {
+          SGK.toast('Ini pengurus terakhir. Angkat pengurus lain dulu sebelum menurunkannya.');
+          sel.value = semula; return;
+        }
+      }
+
+      const konfirmasi = confirm(`Ubah peran ${nama} dari ${PERAN[semula]} menjadi ${PERAN[baru]}?`);
+      if (!konfirmasi) { sel.value = semula; return; }
+
+      sel.disabled = true;
+      try {
+        await DB.stats.setRole(id, baru);
+        sel.dataset.semula = baru;
+        const m = members.find(x => x.id === id); if (m) m.role = baru;
+        SGK.toast(`${nama} kini berperan ${PERAN[baru]}.`);
+      } catch (err) {
+        sel.value = semula;
+        SGK.toast(err.message || 'Gagal mengubah peran.');
+      } finally { sel.disabled = false; }
+    });
+
+    const doa = doaRaw || [];
+    mod.innerHTML = doa.slice(0,4).map((d,i) => `${i?'<div class="hairline"></div>':''}
+      <div class="row-b"><div><h4 style="font-size:13px">${d.title}</h4>
+        <p class="small muted">${d.author} · ${d.waktu}</p></div>
+        <span class="chip">${d.supports || 0} mendoakan</span></div>`).join('')
+      || '<p class="small muted">Belum ada pokok doa masuk.</p>';
+
+    App.filter('#q', '#rows tr');
+    App.bindAll();
+    SGK.paintScenes();
+  })();
+
+  function csv(){
+    if (!members.length) { SGK.toast('Belum ada data anggota untuk diekspor.'); return; }
+    const head = 'Nama,Nomor Anggota,Bergabung,Peran\n';
+    const body = members.map(m => [m.full_name, m.member_no || '', m.joined_at, m.role]
+      .map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
+    const blob = new Blob(['\ufeff' + head + body], {type:'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'sgkconnect-anggota-' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click(); URL.revokeObjectURL(a.href);
+    SGK.toast('Data anggota diunduh sebagai CSV.');
+  }
+  xlsBtn.addEventListener('click', csv);
+  pdfBtn.addEventListener('click', () => { SGK.toast('Menyiapkan versi cetak…'); setTimeout(() => window.print(), 400); });
+  repBtn.addEventListener('click', () => SGK.toast('Laporan bulanan dibuat.'));
+  annBtn.addEventListener('click', () => SGK.toast('Pengumuman dikirim ke seluruh anggota.'));
+</script>
+</body>
+</html>

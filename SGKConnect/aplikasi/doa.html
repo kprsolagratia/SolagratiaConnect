@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pokok Doa · SGKConnect</title>
+<meta name="theme-color" content="#102A43">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="ico-btn burger" aria-label="Buka menu" data-icon="menu"></button>
+      <label class="search"><span data-icon="search" data-size="17"></span>
+        <input id="q" type="search" placeholder="Cari pokok doa…" aria-label="Cari pokok doa"></label>
+      <div class="spacer"></div>
+      <button class="ico-btn" data-lang-toggle style="font-family:Poppins;font-size:11.5px;font-weight:600">ID</button>
+      <button class="ico-btn" data-theme-toggle data-t-aria="umum.tema" aria-label="Ganti tema"></button>
+      <div class="avatar" data-scene="face"></div>
+    </header>
+
+    <section class="rise">
+      <div class="eyebrow" data-t="doa.eyebrow">Dinding doa jemaat</div>
+      <h1 style="margin-top:8px" data-t="doa.judul">Pokok Doa</h1>
+      <p class="muted small" style="margin-top:8px">Setiap permohonan dibaca dan didoakan bersama. Kamu bisa mengirim tanpa nama.</p>
+    </section>
+
+    <section class="grid hero-grid rise">
+      <div class="stack">
+        <article class="card">
+          <div class="row-b"><div class="lab" data-t="doa.tambah">Tambah pokok doa</div><span class="chip">Terbit setelah ditinjau pengurus</span></div>
+          <form id="newPray" style="margin-top:14px">
+            <div class="field"><label for="pt">Judul</label>
+              <input id="pt" type="text" placeholder="Contoh: Kesehatan keluarga" required></div>
+            <div class="field"><label for="pd">Permohonan</label>
+              <input id="pd" type="text" placeholder="Tulis singkat apa yang ingin didoakan" required></div>
+            <label class="row small muted" style="gap:8px;margin-bottom:14px">
+              <input type="checkbox" id="anon" style="width:auto"> Kirim sebagai anonim</label>
+            <button class="btn btn-gold btn-full" type="submit">Kirim permohonan doa</button>
+          </form>
+        </article>
+
+        <div class="tabs" id="tabs">
+          <button class="tab on" data-f="all" data-t="doa.terbaru">Terbaru</button>
+          <button class="tab" data-f="mine">Saya mendoakan</button>
+          <button class="tab" data-f="anon">Anonim</button>
+        </div>
+
+        <div class="stack" id="list"></div>
+      </div>
+
+      <div class="stack">
+        <article class="card" style="padding:0;overflow:hidden">
+          <div style="height:150px" data-scene="pray"></div>
+          <div style="padding:18px">
+            <div class="lab" data-t="doa.ayatPenguat">Ayat penguat</div>
+            <p class="font-display" style="font-size:15px;font-weight:400;line-height:1.65;margin-top:10px">
+              "Janganlah hendaknya kamu kuatir tentang apa pun juga, tetapi nyatakanlah dalam segala hal keinginanmu kepada Allah dalam doa dan permohonan dengan ucapan syukur."</p>
+            <div class="ref" style="margin-top:10px">Filipi 4:6</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="lab" data-t="doa.statistik">Statistik doa</div>
+          <div class="row-b" style="margin-top:14px">
+            <div><span class="small muted">Permohonan bulan ini</span><b class="font-display" style="display:block;font-size:24px">142</b></div>
+            <div><span class="small muted">Kamu doakan</span><b class="font-display" style="display:block;font-size:24px" id="myCount">0</b></div>
+          </div>
+          <div class="hairline"></div>
+          <div class="lab" data-t="doa.jadwalDoa">Jadwal doa bersama</div>
+          <div class="row-b small" style="margin-top:10px"><span>Doa pagi</span><b>Senin · 05.30</b></div>
+          <div class="hairline"></div>
+          <div class="row-b small"><span>Doa puasa pemuda</span><b>Jumat · 12.00</b></div>
+        </article>
+
+        <article class="card">
+          <div class="lab" data-t="doa.pesanPenguat">Pesan penguatan terbaru</div>
+          <div id="notes" style="margin-top:12px"></div>
+        </article>
+      </div>
+    </section>
+  </main>
+</div>
+<nav class="mobile-nav"></nav>
+
+<script src="assets/js/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/ui.js"></script>
+<script>SGK_I18N.mulai();window.addEventListener("sgk:lang",()=>location.reload());</script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  SGK.shell('doa.html');
+
+  function item(p){
+    return `<article class="card" data-id="${p.id}" data-anon="${p.is_anon}" data-name="${p.title} ${p.body}">
+      <div class="row-b">
+        <h3 style="font-size:16px">${p.title}</h3>
+        <span class="badge ${p.is_anon?'b-navy':'b-gold'}">${p.author || 'Anggota'}</span>
+      </div>
+      <p class="verse" style="margin-top:8px">${p.body}</p>
+      <div class="row-b wrap" style="margin-top:14px">
+        <div class="row wrap">
+          <button class="btn btn-navy btn-sm" data-pray="${p.id}">Saya mendoakan</button>
+          <span class="chip" data-praycount="${p.id}" data-base="${p.supports||0}">${p.supports||0} orang mendoakan</span>
+        </div>
+        <span class="small muted">${p.waktu || ''}</span>
+      </div>
+      <div class="hairline"></div>
+      <div class="row" style="gap:8px">
+        <input style="flex:1;padding:9px 13px;border-radius:11px;border:1px solid var(--line);
+          background:var(--bg);font:inherit;font-size:13px;color:var(--ink)"
+          placeholder="Kirim pesan penguatan…" aria-label="Pesan penguatan terbaru">
+        <button class="btn btn-line btn-sm" data-note="${p.id}">Kirim</button>
+      </div>
+    </article>`;
+  }
+
+  async function muat(){
+    const [doaRaw, mineRaw] = await Promise.all([
+      DB.prayers.list().catch(() => []),
+      DB.prayers.mySupports().catch(() => ({}))
+    ]);
+    const doa = doaRaw || [];
+    list.innerHTML = doa.length ? doa.map(item).join('')
+      : '<p class="muted">Belum ada pokok doa. Jadilah yang pertama mengirim.</p>';
+    document.querySelectorAll('[data-note]').forEach(b => b.addEventListener('click', async () => {
+      const inp = b.previousElementSibling;
+      if(!inp.value.trim()){ SGK.toast('Tulis pesanmu dulu.'); return; }
+      await DB.prayers.addNote(b.dataset.note, inp.value.trim());
+      inp.value = ''; SGK.toast('Pesan penguatan terkirim.');
+    }));
+    App.bindAll();
+    myCount.textContent = Object.values(mineRaw || {}).filter(Boolean).length;
+  }
+
+  (async function () {
+    const me = await DB.auth.guard(); if (!me) return;
+    SGK.store.set('user', { name: me.full_name || 'Anggota', role: me.role === 'admin' ? 'Pengurus' : 'Pemuda', avatar: me.avatar_url || null });
+
+    notes.innerHTML = [['Sarah','Tetap kuat ya, kami sekeluarga ikut mendoakan.','face3'],
+                       ['David','Tuhan pasti buka jalan pada waktu-Nya.','face2']]
+      .map((n,i) => `${i?'<div class="hairline"></div>':''}<div class="row" style="align-items:flex-start">
+        <div class="avatar" style="width:32px;height:32px" data-scene="${n[2]}"></div>
+        <div><h4 style="font-size:13px">${n[0]}</h4><p class="small muted">"${n[1]}"</p></div></div>`).join('');
+
+    await muat();
+    SGK.paintScenes();
+
+    newPray.addEventListener('submit', async e => {
+      e.preventDefault();
+      const judul = pt.value.trim(), isi = pd.value.trim();
+      if(!judul || !isi){ SGK.toast('Lengkapi judul dan permohonan.'); return; }
+      const b = newPray.querySelector('button[type=submit]');
+      b.disabled = true; b.textContent = 'Mengirim…';
+      try {
+        await DB.prayers.create(judul, isi, anon.checked);
+        newPray.reset(); await muat();
+        SGK.toast(SGK.t('pesan.doaTerkirim'));
+      } finally { b.disabled = false; b.textContent = 'Kirim permohonan doa'; }
+    });
+
+    DB.prayers.subscribe(() => muat());
+
+    App.filter('#q', '#list .card');
+    tabs.addEventListener('click', async e => {
+      const b = e.target.closest('.tab'); if(!b) return;
+      tabs.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t===b));
+      const f = b.dataset.f, mine = await DB.prayers.mySupports();
+      document.querySelectorAll('#list .card').forEach(c => {
+        const show = f==='all' || (f==='anon' && c.dataset.anon==='true') || (f==='mine' && mine[c.dataset.id]);
+        c.style.display = show ? '' : 'none';
+      });
+    });
+  })();
+</script>
+</body>
+</html>
