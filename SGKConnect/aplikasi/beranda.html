@@ -130,7 +130,7 @@
 <nav class="mobile-nav" aria-label="Navigasi utama"></nav>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=18"></script>
+<script src="assets/js/config.js?v=19"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -143,7 +143,7 @@
   (async function () {
     const me = await DB.auth.guard();
     if (!me) return;
-    const nama = (me && (me.full_name || me.nama)) || 'Anggota';
+    const nama = (me && typeof me === 'object' && (me.full_name || me.nama)) || 'Anggota';
     SGK.store.set('user', { name: nama, role: me.role === 'admin' ? 'Pengurus' : 'Pemuda', avatar: me.avatar_url || null });
     const h = new Date().getHours();
     const sapa = h < 11 ? 'beranda.pagi' : h < 15 ? 'beranda.siang'
