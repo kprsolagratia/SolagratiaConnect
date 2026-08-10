@@ -200,7 +200,10 @@
   ];
 
   function shell(current) {
-    const user = store.get('user', { name: 'Theo Rakyan', role: 'Pemuda · GS Zion' });
+    // store.get bisa mengembalikan null (mis. sesaat setelah keluar akun),
+    // jadi nilai bawaan harus dipasang setelahnya, bukan lewat argumen.
+    let user = store.get('user', null);
+    if (!user || typeof user !== 'object') user = { name: 'Anggota', role: 'Pemuda' };
     const foto = user.avatar || null;
     const side = document.querySelector('.sidebar');
     if (side) {
