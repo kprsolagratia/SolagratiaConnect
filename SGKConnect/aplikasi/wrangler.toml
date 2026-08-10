@@ -21,3 +21,15 @@ not_found_handling = "404-page"
 
 # Alamat tetap seperti yang ditulis: /beranda.html, bukan /beranda
 html_handling = "none"
+
+# Berkas konfigurasi tidak boleh disimpan lama oleh peramban,
+# supaya perubahan kredensial langsung terbaca.
+[[assets.headers]]
+for = "/assets/js/config.js"
+[assets.headers.values]
+"Cache-Control" = "no-store"
+
+[[assets.headers]]
+for = "/sw.js"
+[assets.headers.values]
+"Cache-Control" = "no-store"
