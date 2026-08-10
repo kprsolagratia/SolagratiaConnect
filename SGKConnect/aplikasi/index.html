@@ -38,11 +38,11 @@
       <form id="loginForm" novalidate>
         <div class="field" id="nameField" hidden>
           <label for="nama">Nama lengkap</label>
-          <input id="nama" name="nama" type="text" autocomplete="name" placeholder="Theo Rakyan">
+          <input id="nama" name="nama" type="text" autocomplete="name" placeholder="Nama lengkap Anda">
         </div>
         <div class="field">
           <label for="email">Email</label>
-          <input id="email" name="email" type="email" autocomplete="username" placeholder="theo@sendawar.id" required>
+          <input id="email" name="email" type="email" autocomplete="username" placeholder="nama@email.com" required>
         </div>
         <div class="field">
           <label for="pass">Kata sandi</label>
@@ -71,7 +71,7 @@
 </main>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js"></script>
+<script src="assets/js/config.js?v=18"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -85,9 +85,22 @@
   let daftar = false;
 
   if (!DB.live) {
-    modeNote.innerHTML = '<span style="color:var(--gold)">Mode demo</span> — belum tersambung ke database. ' +
-      'Isi <code>assets/js/config.js</code> untuk mengaktifkan akun sungguhan.';
+    const c = window.SGK_CONFIG;
+    let sebab;
+    if (!c) {
+      sebab = 'Berkas <code>assets/js/config.js</code> tidak ditemukan di server.';
+    } else if (!c.SUPABASE_URL || !c.SUPABASE_ANON_KEY) {
+      sebab = 'config.js ada, tapi SUPABASE_URL atau SUPABASE_ANON_KEY masih kosong.';
+    } else if (!window.supabase || !window.supabase.createClient) {
+      sebab = 'Pustaka Supabase gagal dimuat (assets/js/supabase.min.js).';
+    } else {
+      sebab = 'Penyebab tidak diketahui — periksa Console (F12).';
+    }
+    modeNote.innerHTML = '<span style="color:var(--gold)">Mode demo</span> — ' + sebab +
+      '<br><span style="font-size:11px">Sudah memperbaikinya? Ketik <b>SGK_RESET()</b> di Console (F12), ' +
+      'lalu muat ulang.</span>';
     modeNote.style.color = 'var(--muted)';
+    console.warn('[SGKConnect] Mode demo. Sebab:', sebab, '| config:', c);
   }
   if (window.SGK_CONFIG && SGK_CONFIG.ALLOW_SIGNUP === false) switchBtn.hidden = true;
 
