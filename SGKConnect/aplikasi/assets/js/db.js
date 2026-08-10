@@ -78,12 +78,12 @@
     async me() {
       if (!sb) {
         const u = store.get('user', null);
-        if (!u) return null;
+        if (!u || typeof u !== 'object') return null;
         return {
           id: 'demo',
-          role: 'admin',                       // mode demo: semua halaman terbuka
-          full_name: u.name || (D().profil || {}).nama || 'Tamu',
-          member_no: (D().profil || {}).id || 'SGK-DEMO-0001'
+          role: 'admin',                    // mode demo: semua halaman terbuka
+          full_name: u.name || 'Pengunjung',
+          member_no: 'SGK-DEMO-0001'
         };
       }
       const user = await pengguna();
@@ -94,14 +94,23 @@
     },
 
     async signIn(email, password) {
-      if (!sb) { store.set('user', { name: D().profil?.nama || 'Anggota', role: 'Pemuda' }); return { demo: true }; }
+      if (!sb) {
+        // Mode demo: tidak ada pemeriksaan sandi. Nama diambil dari email
+        // supaya tidak memakai identitas orang lain.
+        const nama = String(email || 'pengunjung').split('@')[0]
+          .replace(/[._-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        store.set('user', { name: nama, role: 'Pemuda' });
+        return { demo: true };
+      }
+      store.set('user', { name: 'Anggota', role: 'Pemuda' });  // identitas lama dibuang
+      _user = null; _profil = null;
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if (error) fail(error);
       return data;
     },
 
     async signUp(email, password, fullName) {
-      if (!sb) { store.set('user', { name: fullName || 'Anggota', role: 'Pemuda' }); return { demo: true }; }
+      if (!sb) { store.set('user', { name: fullName || 'Pengunjung', role: 'Pemuda' }); return { demo: true }; }
       const { data, error } = await sb.auth.signUp({
         email, password,
         options: { data: { full_name: fullName }, emailRedirectTo: location.origin + '/beranda.html' }
@@ -119,7 +128,7 @@
     async signOut() {
       if (sb) await sb.auth.signOut();
       _user = null; _profil = null;
-      store.set('user', null);
+      store.set('user', { name: 'Anggota', role: 'Pemuda' });
     },
 
     /**
@@ -131,7 +140,7 @@
     async guard() {
       if (!sb) {
         if (!store.get('user', null)) {
-          store.set('user', { name: (D().profil || {}).nama || 'Tamu', role: 'Pemuda' });
+          store.set('user', { name: 'Pengunjung', role: 'Pemuda' });
         }
         return auth.me();
       }
