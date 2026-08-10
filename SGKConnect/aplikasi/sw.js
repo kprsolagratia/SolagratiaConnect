@@ -11,7 +11,7 @@
      • Panggilan API Supabase          → tidak disentuh sama sekali
    ============================================================ */
 
-const VERSION = 'sgk-v20';
+const VERSION = 'sgk-v21';
 
 /* Berkas yang disimpan supaya aplikasi tetap terbuka saat offline. */
 const ASSETS = [
