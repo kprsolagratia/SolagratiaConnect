@@ -350,9 +350,11 @@
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', async () => {
     try {
-      const reg = await navigator.serviceWorker.register('sw.js');
+      const reg = await navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
       // paksa cek versi baru setiap kali halaman dibuka
       reg.update();
+      // dan periksa lagi tiap 60 detik selama halaman terbuka
+      setInterval(() => reg.update(), 60000);
 
       reg.addEventListener('updatefound', () => {
         const baru = reg.installing;
