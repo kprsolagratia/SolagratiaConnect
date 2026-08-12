@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-192.png">
-<link rel="stylesheet" href="assets/css/app.css?v=21">
+<link rel="stylesheet" href="assets/css/app.css?v=24">
 </head>
 <body>
 <div class="shell">
@@ -59,7 +59,7 @@
 <nav class="mobile-nav"></nav>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=21"></script>
+<script src="assets/js/config.js?v=24"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -72,7 +72,7 @@
 
   (async function () {
     const me = await DB.auth.guard(); if (!me) return;
-    SGK.store.set('user', { name: me.full_name || 'Anggota', role: me.role === 'admin' ? 'Pengurus' : 'Pemuda', avatar: me.avatar_url || null });
+    SGK.store.set('user', { name: me.full_name || 'Anggota', role: ({admin:'Pengurus',pastor:'Pendeta',leader:'Pemimpin'})[me.role] || 'Pemuda', avatar: me.avatar_url || null });
     const [evsRaw, hRaw] = await Promise.all([
       DB.events.list().catch(() => []),
       DB.events.myAttendance().catch(() => [])
@@ -84,7 +84,9 @@
         .toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
       const kuota = e.capacity || 100, isi = e.going || 0;
       return `<article class="card" data-cat="${e.category||''}" data-name="${e.title} ${e.location||''} ${e.category||''}" style="padding:0;overflow:hidden">
-        <div style="height:150px;position:relative" data-scene="${e.scene||'camp'}"></div>
+        <div style="height:150px;position:relative;overflow:hidden"${e.banner_url ? '' : ` data-scene="${e.scene||'camp'}"`}>
+          ${e.banner_url ? `<img src="${e.banner_url}" alt="${(e.title||'').replace(/"/g,'')}"
+            loading="lazy" style="width:100%;height:100%;object-fit:cover">` : ''}</div>
         <div style="padding:18px">
           <div class="row-b"><span class="badge b-gold">${e.category||'Kegiatan'}</span>
             <span class="chip">${isi}/${kuota} kursi</span></div>

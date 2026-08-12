@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-192.png">
-<link rel="stylesheet" href="assets/css/app.css?v=21">
+<link rel="stylesheet" href="assets/css/app.css?v=24">
 </head>
 <body>
 <div class="shell">
@@ -93,7 +93,7 @@
 <nav class="mobile-nav"></nav>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=21"></script>
+<script src="assets/js/config.js?v=24"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -107,9 +107,12 @@
 
   (async function () {
     const me = await DB.auth.guard(); if (!me) return;
-    SGK.store.set('user', { name: me.full_name || 'Anggota', role: me.role === 'admin' ? 'Pengurus' : 'Pemuda', avatar: me.avatar_url || null });
+    SGK.store.set('user', Object.assign(SGK.store.get('user', {}) || {}, {
+      name: me.full_name || 'Anggota',
+      role: ({admin:'Pengurus', pastor:'Pendeta', leader:'Pemimpin'})[me.role] || 'Pemuda',
+      avatar: me.avatar_url || null }));
 
-    if (DB.live && me.role !== 'admin' && me.role !== 'leader') {
+    if (DB.live && !['admin','leader','pastor'].includes(me.role)) {
       document.querySelector('.main').innerHTML =
         '<div class="card" style="margin-top:40px;text-align:center;padding:40px">' +
         '<h2>Halaman khusus pengurus</h2>' +
@@ -164,7 +167,7 @@
     members = membersRaw || [];
     memCount.textContent = (s_.anggota ?? members.length) + ' terdaftar';
 
-    const PERAN = { member:'Anggota', leader:'Pemimpin', admin:'Pengurus' };
+    const PERAN = { member:'Anggota', leader:'Pemimpin', pastor:'Pendeta', admin:'Pengurus' };
 
     function barisAnggota(m) {
       const sendiri = m.id === me.id;

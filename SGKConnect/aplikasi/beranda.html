@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-192.png">
-<link rel="stylesheet" href="assets/css/app.css?v=21">
+<link rel="stylesheet" href="assets/css/app.css?v=24">
 </head>
 <body>
 <div class="shell">
@@ -33,17 +33,19 @@
       <p class="muted small" style="margin-top:6px;font-style:italic">"Kiranya Tuhan memberkati langkahmu hari ini."</p>
     </section>
 
-    <section class="grid hero-grid rise">
-      <article class="hero">
-        <div data-scene="worship"></div>
-        <div class="hero-copy">
-          <div class="k" id="heroDate"></div>
-          <h2>Rise Together,<br>Shine for Christ</h2>
+    <section class="hero-lepas rise" id="hero">
+      <div class="media" id="heroMedia" data-scene="worship"></div>
+      <div class="isi">
+        <div class="k" id="heroDate"></div>
+        <h2 id="heroJudul">Rise Together,<br>Shine for Christ</h2>
+        <div class="row wrap">
           <a class="btn btn-gold" href="kegiatan.html">Lihat kegiatan</a>
           <button class="btn btn-ghost" id="btnCheckin">Check-in QR</button>
         </div>
-      </article>
+      </div>
+    </section>
 
+    <section class="rise">
       <article class="card stack" style="justify-content:center">
         <div>
           <div class="lab" data-t="beranda.kegiatanBerikut">Kegiatan terdekat</div>
@@ -130,7 +132,7 @@
 <nav class="mobile-nav" aria-label="Navigasi utama"></nav>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=21"></script>
+<script src="assets/js/config.js?v=24"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -144,7 +146,7 @@
     const me = await DB.auth.guard();
     if (!me) return;
     const nama = (me && typeof me === 'object' && (me.full_name || me.nama)) || 'Anggota';
-    SGK.store.set('user', { name: nama, role: me.role === 'admin' ? 'Pengurus' : 'Pemuda', avatar: me.avatar_url || null });
+    SGK.store.set('user', { name: nama, role: ({admin:'Pengurus',pastor:'Pendeta',leader:'Pemimpin'})[me.role] || 'Pemuda', avatar: me.avatar_url || null });
     const h = new Date().getHours();
     const sapa = h < 11 ? 'beranda.pagi' : h < 15 ? 'beranda.siang'
                : h < 19 ? 'beranda.sore' : 'beranda.malam';
@@ -164,19 +166,29 @@
 
     if (set) {
       if (set.greeting_note) document.querySelector('#greet + p').textContent = '"' + set.greeting_note + '"';
-      if (set.hero_title) {
-        const ht = document.querySelector('.hero-copy h2');
-        ht.innerHTML = set.hero_title.replace(/,\s*/, ',<br>');
+      if (set.hero_title) heroJudul.innerHTML = set.hero_title.replace(/,\s*/, ',<br>');
+      if (set.hero_subtitle) {
+        heroJudul.insertAdjacentHTML('afterend',
+          `<p style="font-family:Poppins;font-weight:300;font-size:15px;
+             color:rgba(255,255,255,.88);margin:-8px 0 16px;max-width:520px">${set.hero_subtitle}</p>`);
       }
-      if (set.hero_image_url) {
-        const hero = document.querySelector('.hero [data-scene]');
-        hero.removeAttribute('data-scene');
-        hero.innerHTML = `<img src="${set.hero_image_url}" alt=""
-          style="width:100%;height:100%;object-fit:cover">
-          <div style="position:absolute;inset:0;background:linear-gradient(180deg,
-            rgba(11,30,51,.1) 40%, rgba(11,30,51,.75))"></div>`;
+      /* Latar hero, urutan pilihan:
+           1. video dari pengaturan   2. gambar dari pengaturan
+           3. banner kegiatan terdekat  4. ilustrasi bawaan */
+      const media = document.getElementById('heroMedia');
+      const banner = (evs && evs[0] && evs[0].banner_url) || null;
+      if (set.hero_video_url) {
+        media.removeAttribute('data-scene');
+        media.innerHTML = `<video src="${set.hero_video_url}" autoplay muted loop playsinline
+          ${set.hero_image_url ? `poster="${set.hero_image_url}"` : ''}></video>`;
+      } else if (set.hero_image_url) {
+        media.removeAttribute('data-scene');
+        media.innerHTML = `<img src="${set.hero_image_url}" alt="">`;
+      } else if (banner) {
+        media.removeAttribute('data-scene');
+        media.innerHTML = `<img src="${banner}" alt="">`;
       } else if (set.hero_scene) {
-        document.querySelector('.hero [data-scene]').dataset.scene = set.hero_scene;
+        media.dataset.scene = set.hero_scene;
       }
       if (set.verse_text) vsText.textContent = '"' + set.verse_text + '"';
       if (set.verse_ref) vsRef.textContent = set.verse_ref;

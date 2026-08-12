@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forum Diskusi · SGKConnect</title>
+<meta name="theme-color" content="#102A43">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<link rel="stylesheet" href="assets/css/app.css?v=24">
+<style>
+  .topik{cursor:pointer;transition:transform .2s var(--ease)}
+  .topik:hover{transform:translateY(-2px)}
+  .balasan{display:flex;gap:11px;padding:14px 0;border-top:1px solid var(--line)}
+  .balasan .avatar{width:34px;height:34px}
+  .tulis{
+    position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--line);
+    padding:14px 0 calc(14px + env(safe-area-inset-bottom));margin-top:12px
+  }
+  .tulis textarea{
+    width:100%;min-height:74px;padding:12px 14px;border-radius:13px;border:1px solid var(--line);
+    background:var(--bg);font:inherit;font-size:14px;color:var(--ink);resize:vertical;outline:none
+  }
+  .tulis textarea:focus{border-color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="ico-btn burger" aria-label="Buka menu" data-icon="menu"></button>
+      <label class="search"><span data-icon="search" data-size="17"></span>
+        <input id="q" type="search" placeholder="Cari topik…" aria-label="Cari topik"></label>
+      <div class="spacer"></div>
+      <button class="ico-btn" data-lang-toggle style="font-family:Poppins;font-size:11.5px;font-weight:600">ID</button>
+      <button class="ico-btn" data-theme-toggle aria-label="Ganti tema"></button>
+      <div class="avatar" data-scene="face"></div>
+    </header>
+
+    <!-- daftar topik -->
+    <div id="layarDaftar">
+      <section class="row-b wrap rise">
+        <div>
+          <div class="eyebrow">Koinonia</div>
+          <h1 style="margin-top:8px">Forum Diskusi</h1>
+          <p class="muted small" style="margin-top:8px">
+            Tempat bertanya, berbagi, dan saling menguatkan.</p>
+        </div>
+        <button class="btn btn-gold" id="btnBaru">+ Buat topik</button>
+      </section>
+
+      <section class="stack rise" id="daftar"></section>
+    </div>
+
+    <!-- satu topik -->
+    <div id="layarTopik" hidden>
+      <button class="btn btn-line btn-sm rise" id="kembali" style="align-self:flex-start">‹ Semua topik</button>
+
+      <article class="card rise" style="margin-top:14px">
+        <div class="row" style="align-items:flex-start">
+          <div class="avatar" id="tAva" data-scene="face"></div>
+          <div style="flex:1;min-width:0">
+            <h2 id="tJudul" style="font-size:19px"></h2>
+            <p class="small muted" style="margin-top:4px"><span id="tOleh"></span> · <span id="tWaktu"></span></p>
+          </div>
+          <button class="btn btn-line btn-sm" id="hapusTopik" hidden>Hapus</button>
+        </div>
+        <p id="tIsi" style="margin-top:14px;font-size:14.5px;line-height:1.75"></p>
+      </article>
+
+      <section class="card rise" style="margin-top:14px">
+        <div class="lab"><span id="jmlBalasan">0</span> balasan</div>
+        <div id="balasan"></div>
+
+        <div class="tulis">
+          <textarea id="isiBalasan" placeholder="Tulis balasanmu…" aria-label="Tulis balasan"></textarea>
+          <div class="row-b" style="margin-top:10px">
+            <span class="small muted">Sampaikan dengan hormat dan membangun.</span>
+            <button class="btn btn-gold btn-sm" id="kirimBalasan">Kirim</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<nav class="mobile-nav"></nav>
+
+<div class="modal" id="modalBaru"><div class="box" style="text-align:left;max-width:480px">
+  <div class="row-b" style="margin-bottom:16px">
+    <h2 style="font-size:19px">Buat topik baru</h2>
+    <button class="ico-btn" id="tutupBaru" aria-label="Tutup" data-icon="x"></button>
+  </div>
+  <div class="field">
+    <label for="judulBaru">Judul</label>
+    <input id="judulBaru" type="text" placeholder="Contoh: Bagaimana menjaga waktu teduh saat kuliah?">
+  </div>
+  <div class="field">
+    <label for="isiBaru">Isi</label>
+    <textarea id="isiBaru" placeholder="Ceritakan lebih lengkap…"
+      style="width:100%;min-height:120px;padding:12px 14px;border-radius:13px;border:1px solid var(--line);
+             background:var(--bg);font:inherit;font-size:14px;color:var(--ink);resize:vertical"></textarea>
+  </div>
+  <div class="row" style="margin-top:18px">
+    <button class="btn btn-line" style="flex:1" id="batalBaru">Batal</button>
+    <button class="btn btn-gold" style="flex:1" id="simpanBaru">Terbitkan</button>
+  </div>
+</div></div>
+
+<script src="assets/js/supabase.min.js"></script>
+<script src="assets/js/config.js?v=24"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/forum.js"></script>
+</body>
+</html>
