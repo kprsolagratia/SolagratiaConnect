@@ -176,11 +176,11 @@
     if (!me) return;
     SGK.store.set('user', Object.assign(SGK.store.get('user', {}), {
       name: me.full_name || 'Anggota',
-      role: me.role === 'admin' ? 'Pengurus' : 'Pemuda',
+      role: ({admin:'Pengurus',pastor:'Pendeta',leader:'Pemimpin'})[me.role] || 'Pemuda',
       avatar: me.avatar_url || null
     }));
     SGK.shell('galeri.html');
-    if (me.role === 'admin' || me.role === 'leader') $('tambahFoto').hidden = false;
+    if (['admin','leader','pastor'].includes(me.role)) $('tambahFoto').hidden = false;
 
     try {
       semua = (await DB.community.gallery(200)) || [];

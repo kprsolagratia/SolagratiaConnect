@@ -15,6 +15,7 @@
     events: {
       label: 'Kegiatan', tunggal: 'kegiatan',
       kolom: [
+        { k: 'banner_url', t: 'Banner', gambar: true },
         { k: 'title', t: 'Judul' },
         { k: 'starts_at', t: 'Waktu', f: v => tanggalJam(v) },
         { k: 'location', t: 'Lokasi' },
@@ -29,7 +30,9 @@
         { k: 'map_query', l: 'Kata kunci Google Maps', tipe: 'text',
           bantu: 'Dipakai tombol "Buka di Google Maps". Kosongkan untuk memakai lokasi di atas.' },
         { k: 'capacity', l: 'Kuota peserta', tipe: 'number', bawaan: 100 },
-        { k: 'scene', l: 'Ilustrasi latar', tipe: 'pilih', opsi: SCENE, bawaan: 'camp' },
+        { k: 'banner_url', l: 'Banner kegiatan', tipe: 'berkas',
+          bantu: 'Foto/poster acara. Ukuran ideal 1200×600. Kosongkan untuk memakai ilustrasi bawaan.' },
+        { k: 'scene', l: 'Ilustrasi bawaan (bila banner kosong)', tipe: 'pilih', opsi: SCENE, bawaan: 'camp' },
         { k: 'description', l: 'Keterangan', tipe: 'panjang' }
       ]
     },
@@ -168,9 +171,14 @@
           bantu: 'Muncul di bawah "Selamat pagi, ..."' },
         { k: 'hero_title', l: 'Judul banner beranda', tipe: 'text' },
         { k: 'hero_subtitle', l: 'Anak judul banner', tipe: 'text' },
-        { k: 'hero_image_url', l: 'Foto banner beranda', tipe: 'berkas',
-          bantu: 'Kosongkan untuk memakai ilustrasi bawaan.' },
-        { k: 'hero_scene', l: 'Ilustrasi bawaan banner', tipe: 'pilih', opsi: SCENE },
+        { k: 'hero_image_url', l: 'Gambar latar beranda', tipe: 'berkas',
+          bantu: 'Ukuran ideal 1600×900. Kosongkan untuk memakai ilustrasi bawaan.' },
+        { k: 'hero_video_url', l: 'Video latar beranda', tipe: 'url',
+          ph: 'https://... .mp4',
+          bantu: 'Bila diisi, video menggantikan gambar. Diputar tanpa suara dan berulang. ' +
+                 'Pakai berkas MP4 pendek (10–20 detik) di bawah 5 MB agar tidak boros kuota anggota. ' +
+                 'Unggah dulu lewat tab Galeri Foto, lalu tempel alamatnya di sini.' },
+        { k: 'hero_scene', l: 'Ilustrasi bawaan (bila keduanya kosong)', tipe: 'pilih', opsi: SCENE },
         { k: 'verse_text', l: 'Ayat minggu ini', tipe: 'panjang' },
         { k: 'verse_ref', l: 'Referensi ayat', tipe: 'text', ph: 'Efesus 2:8' },
         { k: 'service_time', l: 'Jadwal ibadah', tipe: 'text', ph: 'Minggu · 09.00' },
@@ -218,10 +226,13 @@
     SGK.shell('kelola.html');
     saya = await DB.auth.guard();
     if (!saya) return;
-    SGK.store.set('user', { name: saya.full_name || 'Anggota', role: saya.role === 'admin' ? 'Pengurus' : 'Pemuda' });
+    SGK.store.set('user', Object.assign(SGK.store.get('user', {}) || {}, {
+      name: saya.full_name || 'Anggota',
+      role: ({admin:'Pengurus', pastor:'Pendeta', leader:'Pemimpin'})[saya.role] || 'Pemuda',
+      avatar: saya.avatar_url || null }));
     SGK.shell('kelola.html');
 
-    if (DB.live && saya.role !== 'admin' && saya.role !== 'leader') {
+    if (DB.live && !['admin','leader','pastor'].includes(saya.role)) {
       document.querySelector('.main').innerHTML =
         '<div class="card" style="margin-top:40px;text-align:center;padding:40px">' +
         '<h2>Halaman khusus pengurus</h2>' +

@@ -76,7 +76,9 @@
       const evs = await DB.publik.events(6);
       $('kegiatan').innerHTML = evs.length ? evs.map(e => `
         <article class="card" style="padding:0;overflow:hidden">
-          <div style="height:130px" data-scene="${esc(e.scene || 'camp')}"></div>
+          <div style="height:130px;overflow:hidden"${e.banner_url ? '' : ` data-scene="${esc(e.scene || 'camp')}"`}>
+            ${e.banner_url ? `<img src="${esc(e.banner_url)}" alt="${esc(e.title)}" loading="lazy"
+              style="width:100%;height:100%;object-fit:cover">` : ''}</div>
           <div style="padding:16px">
             <span class="badge b-gold">${esc(e.category || 'Kegiatan')}</span>
             <h3 style="font-size:16px;margin:10px 0 6px">${esc(e.title)}</h3>

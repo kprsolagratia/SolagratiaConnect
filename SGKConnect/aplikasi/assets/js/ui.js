@@ -191,9 +191,15 @@
     ['alkitab.html', 'book', 'nav.alkitab'],
     ['doa.html', 'pray', 'nav.doa'],
     ['komunitas.html', 'users', 'nav.komunitas'],
+    ['forum.html', 'chat', 'nav.forum'],
+    ['obrolan.html', 'users', 'nav.obrolan'],
     ['galeri.html', 'play', 'nav.galeri'],
     ['profil.html', 'user', 'nav.profil']
   ];
+  /* Menu bawah ponsel dibatasi 6 yang paling sering dipakai.
+     Forum & Galeri tetap ada di sidebar (tombol menu) agar tidak berdesakan. */
+  const NAV_MOBILE = ['beranda.html', 'kegiatan.html', 'alkitab.html',
+                      'doa.html', 'komunitas.html', 'profil.html'];
   const NAV_EXTRA = [
     ['admin.html', 'chart', 'nav.admin'],
     ['kelola.html', 'plus', 'nav.kelola']
@@ -221,8 +227,16 @@
         </div>`;
     }
     const mob = document.querySelector('.mobile-nav');
-    if (mob) mob.innerHTML = NAV.map(([h, i, l]) =>
-      `<a href="${h}" class="${h === current ? 'on' : ''}">${icon(i, 20)}<span>${t(l)}</span></a>`).join('');
+    if (mob) {
+      let daftar = NAV.filter(([h]) => NAV_MOBILE.includes(h));
+      // kalau sedang di halaman yang tidak masuk daftar, tampilkan juga
+      if (current && !NAV_MOBILE.includes(current)) {
+        const ini = NAV.find(([h]) => h === current);
+        if (ini) daftar = daftar.slice(0, 5).concat([ini]);
+      }
+      mob.innerHTML = daftar.map(([h, i, l]) =>
+        `<a href="${h}" class="${h === current ? 'on' : ''}">${icon(i, 20)}<span>${t(l)}</span></a>`).join('');
+    }
 
     document.querySelectorAll('[data-icon]').forEach(e => { if (!e.innerHTML.trim()) e.innerHTML = icon(e.dataset.icon, +e.dataset.size || 18); });
     applyTheme(store.get('theme', 'light'));

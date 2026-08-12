@@ -159,7 +159,7 @@
       }));
       const { data, error } = await sb.from('event_stats').select('*').order('starts_at');
       if (error) fail(error);
-      const { data: ev } = await sb.from('events').select('id,category,location,map_query,scene,description');
+      const { data: ev } = await sb.from('events').select('id,category,location,map_query,scene,description,banner_url');
       const meta = Object.fromEntries((ev || []).map(x => [x.id, x]));
       return (data || []).map(e => Object.assign({}, e, meta[e.id] || {}));
     },
@@ -349,11 +349,13 @@
     async topics() {
       if (!sb) return (D().forum || []).map((f, i) => ({ id: 't' + i, title: f.judul, author: f.oleh, replies: f.balasan, waktu: f.waktu }));
       const { data, error } = await sb.from('forum_topics')
-        .select('id,title,created_at,profiles(full_name),forum_replies(count)')
-        .order('created_at', { ascending: false }).limit(20);
+        .select('id,title,body,created_at,user_id,profiles(full_name,avatar_url),forum_replies(count)')
+        .order('created_at', { ascending: false }).limit(40);
       if (error) fail(error);
       return (data || []).map(t => ({
-        id: t.id, title: t.title, author: t.profiles?.full_name || 'Anggota',
+        id: t.id, title: t.title, body: t.body, user_id: t.user_id,
+        author: t.profiles?.full_name || 'Anggota',
+        avatar: t.profiles?.avatar_url || null,
         replies: t.forum_replies?.[0]?.count || 0, waktu: waktuRelatif(t.created_at)
       }));
     },
@@ -380,6 +382,73 @@
       return data;
     },
 
+    /* ---------- forum diskusi ---------- */
+    async topicDetail(id) {
+      if (!sb) return null;
+      const { data, error } = await sb.from('forum_topics')
+        .select('id,title,body,created_at,user_id,profiles(full_name,avatar_url)')
+        .eq('id', id).maybeSingle();
+      if (error) fail(error);
+      return data ? Object.assign({}, data, {
+        author: data.profiles?.full_name || 'Anggota',
+        avatar: data.profiles?.avatar_url || null,
+        waktu: waktuRelatif(data.created_at)
+      }) : null;
+    },
+
+    async replies(topicId) {
+      if (!sb) return [];
+      const { data, error } = await sb.from('forum_replies')
+        .select('id,body,created_at,user_id,profiles(full_name,avatar_url)')
+        .eq('topic_id', topicId).order('created_at');
+      if (error) fail(error);
+      return (data || []).map(r => Object.assign({}, r, {
+        author: r.profiles?.full_name || 'Anggota',
+        avatar: r.profiles?.avatar_url || null,
+        waktu: waktuRelatif(r.created_at)
+      }));
+    },
+
+    async createTopic(title, body) {
+      if (!sb) { w.SGK?.toast('Mode demo — topik tidak tersimpan.'); return null; }
+      const user = await pengguna();
+      const { data, error } = await sb.from('forum_topics')
+        .insert({ user_id: user.id, title, body }).select().single();
+      if (error) fail(error);
+      return data;
+    },
+
+    async reply(topicId, body) {
+      if (!sb) { w.SGK?.toast('Mode demo — balasan tidak tersimpan.'); return null; }
+      const user = await pengguna();
+      const { data, error } = await sb.from('forum_replies')
+        .insert({ topic_id: topicId, user_id: user.id, body }).select().single();
+      if (error) fail(error);
+      return data;
+    },
+
+    async deleteTopic(id) {
+      if (!sb) return;
+      const { error } = await sb.from('forum_topics').delete().eq('id', id);
+      if (error) fail(error);
+    },
+
+    async deleteReply(id) {
+      if (!sb) return;
+      const { error } = await sb.from('forum_replies').delete().eq('id', id);
+      if (error) fail(error);
+    },
+
+    /** Perubahan langsung pada obrolan. */
+    subscribeForum(cb) {
+      if (!sb) return () => {};
+      const ch = sb.channel('forum')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'forum_topics' }, cb)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'forum_replies' }, cb)
+        .subscribe();
+      return () => sb.removeChannel(ch);
+    },
+
     async announcements() {
       if (!sb) return (D().pengumuman || []).map(a => ({ title: a.judul, body: a.isi, publish_on: a.tgl }));
       const { data } = await sb.from('announcements').select('*')
@@ -389,6 +458,69 @@
       }));
     }
   };
+
+  /* ---------- OBROLAN KELOMPOK ---------- */
+  const chat = {
+    /** Kelompok yang saya ikuti (status aktif). */
+    async myGroups() {
+      if (!sb) return (D().kelompok || []).slice(0, 2).map((g, i) => ({
+        id: 'g' + i, name: g.nama, kind: 'cell', schedule: g.jadwal,
+        scene: g.scene, members: g.anggota || 0 }));
+      const { data, error } = await sb.from('my_groups').select('*').order('name');
+      if (error) fail(error);
+      return data || [];
+    },
+
+    async messages(groupId, limit) {
+      if (!sb) return [];
+      const { data, error } = await sb.from('group_chat').select('*')
+        .eq('group_id', groupId)
+        .order('created_at', { ascending: false }).limit(limit || 80);
+      if (error) fail(error);
+      return (data || []).reverse().map(m => Object.assign({}, m, {
+        waktu: jamPesan(m.created_at)
+      }));
+    },
+
+    async send(groupId, body) {
+      if (!sb) { w.SGK?.toast('Mode demo — pesan tidak terkirim.'); return null; }
+      const teks = String(body || '').trim();
+      if (!teks) throw new Error('Pesan kosong.');
+      if (teks.length > 2000) throw new Error('Pesan terlalu panjang (maksimal 2000 huruf).');
+      const user = await pengguna();
+      const { data, error } = await sb.from('group_messages')
+        .insert({ group_id: groupId, user_id: user.id, body: teks }).select().single();
+      if (error) fail(error);
+      return data;
+    },
+
+    async remove(id) {
+      if (!sb) return;
+      const { error } = await sb.from('group_messages').delete().eq('id', id);
+      if (error) fail(error);
+    },
+
+    /** Pesan baru muncul langsung, tanpa muat ulang. */
+    subscribe(groupId, cb) {
+      if (!sb) return () => {};
+      const ch = sb.channel('chat-' + groupId)
+        .on('postgres_changes',
+            { event: '*', schema: 'public', table: 'group_messages', filter: 'group_id=eq.' + groupId },
+            cb)
+        .subscribe();
+      return () => sb.removeChannel(ch);
+    }
+  };
+
+  /** Jam pesan: hari ini tampil jamnya, lebih lama tampil tanggalnya. */
+  function jamPesan(iso) {
+    const d = new Date(iso), kini = new Date();
+    const jam = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    if (d.toDateString() === kini.toDateString()) return jam;
+    const kemarin = new Date(kini); kemarin.setDate(kini.getDate() - 1);
+    if (d.toDateString() === kemarin.toDateString()) return 'Kemarin ' + jam;
+    return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' ' + jam;
+  }
 
   /* ---------- STATISTIK (admin) ---------- */
   const stats = {
@@ -413,7 +545,7 @@
 
     /** Ubah peran anggota. Hanya berhasil bila pemanggil adalah pengurus (dijaga RLS). */
     async setRole(userId, role) {
-      if (!['member', 'leader', 'admin'].includes(role)) throw new Error('Peran tidak dikenal: ' + role);
+      if (!['member', 'leader', 'pastor', 'admin'].includes(role)) throw new Error('Peran tidak dikenal: ' + role);
       if (!sb) return { demo: true, role };
       const user = await pengguna();
       if (user && user.id === userId && role !== 'admin') {
@@ -429,7 +561,7 @@
     async adminCount() {
       if (!sb) return 2;
       const { count } = await sb.from('profiles')
-        .select('id', { count: 'exact', head: true }).in('role', ['admin', 'leader']);
+        .select('id', { count: 'exact', head: true }).in('role', ['admin', 'leader', 'pastor']);
       return count || 0;
     },
 
@@ -619,6 +751,7 @@
       if (!sb) return { church_name: 'GKKA-I Jemaat Sendawar', app_name: 'SGKConnect',
         tagline: 'Terhubung dalam Kasih, Bertumbuh dalam Firman, Berdampak bagi Dunia.',
         hero_title: 'Rise Together, Shine for Christ', hero_scene: 'worship',
+        hero_video_url: '', hero_subtitle: '',
         verse_text: (D().ayatMinggu || {}).teks, verse_ref: (D().ayatMinggu || {}).ref };
       const { data } = await sb.from('settings').select('*').eq('id', 1).maybeSingle();
       return data || {};
@@ -749,7 +882,7 @@
     return Math.floor(d / 86400) + ' hari lalu';
   }
 
-  w.DB = { mode, live: !!sb, client: sb, auth, events, prayers, bible, community, stats, profile, admin, publik, waktuRelatif };
+  w.DB = { mode, live: !!sb, client: sb, auth, events, prayers, bible, community, stats, profile, admin, publik, chat, waktuRelatif };
 
   if (!sb) {
     console.info('%c[SGKConnect] MODE DEMO — isi assets/js/config.js untuk menyambung ke Supabase.',
