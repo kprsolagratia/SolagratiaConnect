@@ -134,6 +134,7 @@
       avatar: saya.avatar_url || null
     }));
     SGK.shell('forum.html');
+    if (window.SGK_TANDA) SGK_TANDA.mulai('forum.html');
 
     await muatDaftar();
 

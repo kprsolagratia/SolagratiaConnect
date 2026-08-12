@@ -59,6 +59,7 @@ Legenda:
 | Unduh foto | Satu per satu, atau pilih beberapa lalu unduh sekaligus |
 | Forum diskusi | Buat topik, balas, hapus milik sendiri, pembaruan langsung |
 | Obrolan kelompok | Chat di dalam kelompok sel & tim, hanya anggota yang bisa baca |
+| Tanda "ada yang baru" | Titik merah di menu Obrolan, Forum, Doa, Kegiatan, Galeri |
 | Banner kegiatan | Tiap acara bisa pakai foto/poster sendiri |
 | Latar beranda | Gambar atau video, diatur dari Kelola Konten |
 | Keluar akun | Sesi dihapus dengan benar |
@@ -87,7 +88,7 @@ Bagian ini tampil dengan data contoh. Aman untuk demo, tapi jangan diklaim sudah
 | Fitur | Pertimbangan |
 |---|---|
 | Pemindai QR sungguhan | Sekarang QR hanya **ditampilkan**. Untuk memindai perlu kamera (`getUserMedia` + pustaka `jsQR`) di perangkat pengurus |
-| Notifikasi push | Perlu layanan push dan izin peramban |
+| Notifikasi push ke HP | Perlu Firebase/OneSignal + Edge Function. Di iPhone hanya jalan bila aplikasi dipasang ke layar utama (iOS 16.4+) |
 | Laporan terjadwal | Perlu Supabase Edge Function |
 
 ---

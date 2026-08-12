@@ -180,6 +180,7 @@
       avatar: me.avatar_url || null
     }));
     SGK.shell('galeri.html');
+    if (window.SGK_TANDA) SGK_TANDA.mulai('galeri.html');
     if (['admin','leader','pastor'].includes(me.role)) $('tambahFoto').hidden = false;
 
     try {

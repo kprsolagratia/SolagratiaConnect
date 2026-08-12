@@ -87,7 +87,8 @@ create policy "publik baca pengaturan" on settings
 --     menyiratkan data kehadiran anggota.
 -- ------------------------------------------------------------
 create or replace view public_events with (security_invoker = on) as
-  select id, title, category, starts_at, ends_at, location, map_query, scene, description
+  select id, title, category, starts_at, ends_at, location, map_query, scene, description,
+         banner_url
   from events
   where published = true;
 

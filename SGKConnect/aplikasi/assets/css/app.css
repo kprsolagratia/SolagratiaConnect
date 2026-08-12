@@ -395,3 +395,25 @@ h4{font-size:14.5px}
 .row,.row-b{min-width:0}
 .row > *,.row-b > *{min-width:0}
 table{max-width:100%}
+
+/* ---------- tanda "ada yang baru" ---------- */
+.sidebar .nav-i{position:relative}
+.tanda-baru{
+  margin-left:auto;min-width:19px;height:19px;padding:0 6px;border-radius:99px;
+  background:#D9483B;color:#fff;font-family:'Poppins',sans-serif;font-size:10.5px;
+  font-weight:600;display:grid;place-items:center;line-height:1;flex:none;
+  box-shadow:0 0 0 2px rgba(217,72,59,.22)
+}
+[data-rail="lipat"] .sidebar .tanda-baru{
+  position:absolute;top:4px;right:4px;margin:0;min-width:8px;height:8px;
+  padding:0;font-size:0;box-shadow:0 0 0 2px #0F2338
+}
+.mobile-nav a{position:relative}
+.mobile-nav .tanda-baru{
+  position:absolute;top:1px;right:calc(50% - 17px);margin:0;
+  min-width:16px;height:16px;font-size:9px;padding:0 4px
+}
+@media (prefers-reduced-motion:no-preference){
+  .tanda-baru{animation:muncul .25s cubic-bezier(.2,.7,.3,1)}
+  @keyframes muncul{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+}

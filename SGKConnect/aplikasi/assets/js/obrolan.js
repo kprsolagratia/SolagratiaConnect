@@ -156,6 +156,7 @@
       avatar: saya.avatar_url || null
     }));
     SGK.shell('obrolan.html');
+    if (window.SGK_TANDA) SGK_TANDA.mulai('obrolan.html');
 
     sempit = (window.matchMedia
       ? window.matchMedia('(max-width: 860px)').matches

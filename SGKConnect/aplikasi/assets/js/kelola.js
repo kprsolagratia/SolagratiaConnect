@@ -235,6 +235,7 @@
       role: ({admin:'Pengurus', pastor:'Pendeta', leader:'Pemimpin'})[saya.role] || 'Pemuda',
       avatar: saya.avatar_url || null }));
     SGK.shell('kelola.html');
+    if (window.SGK_TANDA) SGK_TANDA.mulai('kelola.html');
 
     if (DB.live && !['admin','leader','pastor'].includes(saya.role)) {
       document.querySelector('.main').innerHTML =

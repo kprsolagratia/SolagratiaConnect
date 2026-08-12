@@ -11,7 +11,7 @@
      • Panggilan API Supabase          → tidak disentuh sama sekali
    ============================================================ */
 
-const VERSION = 'sgk-v27';
+const VERSION = 'sgk-v28';
 
 /* Berkas yang disimpan supaya aplikasi tetap terbuka saat offline. */
 const ASSETS = [
@@ -20,7 +20,7 @@ const ASSETS = [
   'publik.html', 'forum.html', 'obrolan.html', 'konsep.html', '404.html',
   'assets/css/app.css',
   'assets/js/ui.js', 'assets/js/app.js', 'assets/js/data.js', 'assets/js/db.js',
-  'assets/js/kelola.js', 'assets/js/i18n.js', 'assets/js/publik.js',
+  'assets/js/kelola.js', 'assets/js/i18n.js', 'assets/js/tanda.js', 'assets/js/publik.js',
   'assets/js/galeri.js', 'assets/js/forum.js', 'assets/js/obrolan.js', 'assets/js/supabase.min.js',
   'assets/img/logo-mark.png', 'assets/img/logo-mark-light.png',
   'assets/img/logo-lockup.png', 'assets/img/icon-192.png', 'assets/img/favicon.png',
