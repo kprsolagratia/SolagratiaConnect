@@ -178,6 +178,10 @@
           bantu: 'Bila diisi, video menggantikan gambar. Diputar tanpa suara dan berulang. ' +
                  'Pakai berkas MP4 pendek (10–20 detik) di bawah 5 MB agar tidak boros kuota anggota. ' +
                  'Unggah dulu lewat tab Galeri Foto, lalu tempel alamatnya di sini.' },
+        { k: 'hero_fit', l: 'Cara menampilkan gambar latar', tipe: 'pilih', bawaan: 'cover',
+          opsi: [['cover', 'Penuhi layar (dipotong bila perlu)'],
+                 ['contain', 'Tampilkan utuh (cocok untuk logo/poster)']],
+          bantu: 'Pilih "Tampilkan utuh" bila gambarnya logo atau poster yang tidak boleh terpotong.' },
         { k: 'hero_scene', l: 'Ilustrasi bawaan (bila keduanya kosong)', tipe: 'pilih', opsi: SCENE },
         { k: 'verse_text', l: 'Ayat minggu ini', tipe: 'panjang' },
         { k: 'verse_ref', l: 'Referensi ayat', tipe: 'text', ph: 'Efesus 2:8' },
