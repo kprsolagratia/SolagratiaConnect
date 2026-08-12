@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-192.png">
-<link rel="stylesheet" href="assets/css/app.css?v=25">
+<link rel="stylesheet" href="assets/css/app.css?v=26">
 </head>
 <body>
 <div class="shell">
@@ -132,7 +132,7 @@
 <nav class="mobile-nav" aria-label="Navigasi utama"></nav>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=25"></script>
+<script src="assets/js/config.js?v=26"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -176,6 +176,7 @@
            1. video dari pengaturan   2. gambar dari pengaturan
            3. banner kegiatan terdekat  4. ilustrasi bawaan */
       const media = document.getElementById('heroMedia');
+      if (set.hero_fit === 'contain') document.getElementById('hero').classList.add('utuh');
       const banner = (evs && evs[0] && evs[0].banner_url) || null;
       if (set.hero_video_url) {
         media.removeAttribute('data-scene');
