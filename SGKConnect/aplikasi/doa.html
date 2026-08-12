@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-192.png">
-<link rel="stylesheet" href="assets/css/app.css?v=26">
+<link rel="stylesheet" href="assets/css/app.css?v=27">
 </head>
 <body>
 <div class="shell">
@@ -89,7 +89,7 @@
 <nav class="mobile-nav"></nav>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=26"></script>
+<script src="assets/js/config.js?v=27"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -134,8 +134,10 @@
     document.querySelectorAll('[data-note]').forEach(b => b.addEventListener('click', async () => {
       const inp = b.previousElementSibling;
       if(!inp.value.trim()){ SGK.toast('Tulis pesanmu dulu.'); return; }
-      await DB.prayers.addNote(b.dataset.note, inp.value.trim());
-      inp.value = ''; SGK.toast('Pesan penguatan terkirim.');
+      try {
+        await DB.prayers.addNote(b.dataset.note, inp.value.trim());
+        inp.value = ''; SGK.toast('Pesan penguatan terkirim.');
+      } catch (e) { /* pesan sudah tampil dari lapisan DB */ }
     }));
     App.bindAll();
     myCount.textContent = Object.values(mineRaw || {}).filter(Boolean).length;
@@ -173,7 +175,8 @@
     tabs.addEventListener('click', async e => {
       const b = e.target.closest('.tab'); if(!b) return;
       tabs.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t===b));
-      const f = b.dataset.f, mine = await DB.prayers.mySupports();
+      const f = b.dataset.f;
+      const mine = await DB.prayers.mySupports().catch(() => ({}));
       document.querySelectorAll('#list .card').forEach(c => {
         const show = f==='all' || (f==='anon' && c.dataset.anon==='true') || (f==='mine' && mine[c.dataset.id]);
         c.style.display = show ? '' : 'none';

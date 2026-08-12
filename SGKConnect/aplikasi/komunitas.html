@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-192.png">
-<link rel="stylesheet" href="assets/css/app.css?v=26">
+<link rel="stylesheet" href="assets/css/app.css?v=27">
 </head>
 <body>
 <div class="shell">
@@ -43,7 +43,7 @@
     <section class="grid hero-grid rise">
       <article class="card">
         <div class="row-b"><h2 style="font-size:19px" data-t="komunitas.forum">Forum diskusi</h2>
-          <button class="btn btn-gold btn-sm" id="newTopic" data-t="komunitas.buatTopik">Buat topik</button></div>
+          <a class="btn btn-gold btn-sm" href="forum.html" data-t="komunitas.buatTopik">Buat topik</a></div>
         <div id="forum" style="margin-top:14px"></div>
       </article>
 
@@ -59,7 +59,8 @@
             <div data-scene="music"></div><div data-scene="bible"></div><div data-scene="pray"></div>
           </div>
           <div class="row" style="margin-top:14px">
-            <button class="btn btn-line btn-sm" style="flex:1" id="galleryBtn" data-t="komunitas.bukaGaleri">Buka galeri</button>
+            <a class="btn btn-line btn-sm" style="flex:1;justify-content:center" href="galeri.html"
+              data-t="komunitas.bukaGaleri">Buka galeri</a>
             <button class="btn btn-navy btn-sm" style="flex:1" id="liveBtn" data-t="komunitas.streaming">Streaming</button>
           </div>
         </article>
@@ -70,7 +71,7 @@
 <nav class="mobile-nav"></nav>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=26"></script>
+<script src="assets/js/config.js?v=27"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -141,10 +142,12 @@
 
     document.querySelectorAll('[data-join]').forEach(b => b.addEventListener('click', async () => {
       b.disabled = true;
-      await DB.community.join(b.dataset.join);
-      b.setAttribute('aria-pressed','true');
-      b.innerHTML = SGK.icon('check',15) + 'Permintaan terkirim';
-      SGK.toast('Permintaan bergabung ke ' + b.dataset.label + ' dikirim ke pemimpin.');
+      try {
+        await DB.community.join(b.dataset.join);
+        b.setAttribute('aria-pressed','true');
+        b.innerHTML = SGK.icon('check',15) + 'Permintaan terkirim';
+        SGK.toast('Permintaan bergabung ke ' + b.dataset.label + ' dikirim ke pemimpin.');
+      } catch (e) { b.disabled = false; }
     }));
 
     App.filter('#q', '[data-name]');

@@ -12,7 +12,7 @@
 <meta property="og:title" content="SGKConnect — Sola Gratia Koinonia Connect">
 <meta property="og:description" content="Terhubung dalam Kasih, Bertumbuh dalam Firman, Berdampak bagi Dunia.">
 <meta property="og:type" content="website">
-<link rel="stylesheet" href="assets/css/app.css?v=26">
+<link rel="stylesheet" href="assets/css/app.css?v=27">
 </head>
 <body>
 <button data-lang-toggle style="position:fixed;right:18px;top:18px;z-index:50;
@@ -71,7 +71,7 @@
 </main>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=26"></script>
+<script src="assets/js/config.js?v=27"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -128,10 +128,12 @@
   });
 
   forgot.addEventListener('click', async () => {
-    const e = email.value.trim();
-    if (!e) { SGK.toast('Isi email Anda dulu, lalu tekan "Lupa sandi?".'); return; }
-    await DB.auth.resetPassword(e);
-    SGK.toast('Tautan pemulihan dikirim ke ' + e);
+    const em2 = email.value.trim();
+    if (!em2) { SGK.toast('Isi email Anda dulu, lalu tekan "Lupa sandi?".'); return; }
+    try {
+      await DB.auth.resetPassword(em2);
+      SGK.toast('Tautan pemulihan dikirim ke ' + em2);
+    } catch (err) { /* pesan sudah tampil */ }
   });
 
   document.getElementById('loginForm').addEventListener('submit', async function(e){
