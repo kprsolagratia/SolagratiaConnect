@@ -54,7 +54,7 @@
         }
 
         /* renungan + ayat */
-        const dev = await DB.publik.devotion();
+        const dev = await DB.publik.devotion().catch(() => null);
         $('firman').innerHTML = `
           <article class="card">
             <div class="lab">Renungan hari ini</div>

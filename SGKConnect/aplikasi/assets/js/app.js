@@ -11,6 +11,10 @@
 
   function prayCount(p) { return p.jml + (prayed()[p.id] ? 1 : 0); }
 
+  const POLA_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  /** Saat tersambung database, id harus UUID. Id contoh seperti "e1" ditolak. */
+  const idSah = id => !w.DB || !w.DB.live || POLA_UUID.test(String(id || ''));
+
   /* --- RSVP --- */
   let rsvpCache = null;
   async function bindRsvp(root) {
@@ -27,6 +31,7 @@
         btn.innerHTML = on ? S.icon('check', 16) + S.t('beranda.sudahIkut') : label;
       };
       btn.addEventListener('click', async () => {
+        if (!idSah(id)) { S.toast('Kegiatan belum termuat. Coba lagi sebentar.'); return; }
         btn.disabled = true;
         try {
           const on = await w.DB.events.toggleRsvp(id);
@@ -57,6 +62,7 @@
         if (c) { const base = +c.dataset.base || 0; c.textContent = (base + (on ? 1 : 0)) + ' orang mendoakan'; }
       };
       btn.addEventListener('click', async () => {
+        if (!idSah(id)) { S.toast('Pokok doa belum termuat. Coba lagi sebentar.'); return; }
         btn.disabled = true;
         try {
           const on = await w.DB.prayers.toggleSupport(id);
@@ -97,7 +103,7 @@
 
   /* --- Check-in modal --- */
   function checkin(judul, eventId) {
-    if (eventId) w.DB.events.checkIn(eventId).catch(() => {});
+    if (eventId && idSah(eventId)) w.DB.events.checkIn(eventId).catch(() => {});
     const m = S.modal(`
       <div class="lab">Check-in kehadiran</div>
       <h3 style="margin:8px 0 4px">${judul || 'Kegiatan'}</h3>

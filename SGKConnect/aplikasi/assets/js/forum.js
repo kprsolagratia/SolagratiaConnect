@@ -64,7 +64,8 @@
     $('layarTopik').hidden = false;
     try { window.scrollTo(0, 0); } catch (e) {}
 
-    const t = await DB.community.topicDetail(id);
+    let t = null;
+    try { t = await DB.community.topicDetail(id); } catch (e) { t = null; }
     if (!t) { kembaliKeDaftar(); return; }
 
     $('tJudul').textContent = t.title;
@@ -81,7 +82,9 @@
   }
 
   async function muatBalasan() {
-    const daftar = await DB.community.replies(topikAktif);
+    let daftar = [];
+    try { daftar = (await DB.community.replies(topikAktif)) || []; }
+    catch (e) { daftar = []; }
     $('jmlBalasan').textContent = daftar.length;
     $('balasan').innerHTML = daftar.length ? daftar.map(r => {
       const boleh = saya && (r.user_id === saya.id || ['admin','leader','pastor'].includes(saya.role));
@@ -102,9 +105,11 @@
     $('balasan').querySelectorAll('[data-hapus-balasan]').forEach(b =>
       b.addEventListener('click', async () => {
         if (!confirm('Hapus balasan ini?')) return;
-        await DB.community.deleteReply(b.dataset.hapusBalasan);
-        SGK.toast('Balasan dihapus.');
-        muatBalasan();
+        try {
+          await DB.community.deleteReply(b.dataset.hapusBalasan);
+          SGK.toast('Balasan dihapus.');
+          muatBalasan();
+        } catch (e) { /* pesan sudah tampil */ }
       }));
     SGK.paintScenes();
   }
@@ -184,9 +189,11 @@
 
     $('hapusTopik').addEventListener('click', async () => {
       if (!confirm('Hapus topik ini beserta seluruh balasannya?')) return;
-      await DB.community.deleteTopic(topikAktif);
-      SGK.toast('Topik dihapus.');
-      kembaliKeDaftar();
+      try {
+        await DB.community.deleteTopic(topikAktif);
+        SGK.toast('Topik dihapus.');
+        kembaliKeDaftar();
+      } catch (e) { /* pesan sudah tampil */ }
     });
 
     /* pembaruan langsung */

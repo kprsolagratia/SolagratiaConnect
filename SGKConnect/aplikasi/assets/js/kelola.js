@@ -489,7 +489,7 @@
   /* --- Pengaturan --- */
   async function panelPengaturan(panel) {
     const def = KHUSUS.settings;
-    const nilai = await DB.admin.getSettings();
+    const nilai = (await DB.admin.getSettings().catch(() => ({}))) || {};
     panel.innerHTML = `<div class="card">
       <div class="lab">Identitas & tampilan aplikasi</div>
       <p class="small muted" style="margin:8px 0 18px">

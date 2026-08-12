@@ -114,8 +114,10 @@
     $('pesan').querySelectorAll('[data-hapus]').forEach(b =>
       b.addEventListener('click', async () => {
         if (!confirm('Hapus pesan ini?')) return;
-        await DB.chat.remove(b.dataset.hapus);
-        muatPesan(true);
+        try {
+          await DB.chat.remove(b.dataset.hapus);
+          muatPesan(true);
+        } catch (e) { /* pesan sudah tampil */ }
       }));
 
     SGK.paintScenes();

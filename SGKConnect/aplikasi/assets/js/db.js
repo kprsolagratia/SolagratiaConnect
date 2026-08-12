@@ -60,7 +60,19 @@
       'Password should be at least 6 characters': 'Kata sandi minimal 6 karakter.',
       'Failed to fetch': 'Tidak dapat terhubung. Periksa koneksi internet.'
     };
-    return peta[m] || m;
+    if (peta[m]) return peta[m];
+    // pesan teknis dari database diubah jadi kalimat yang bisa dipahami
+    if (/invalid input syntax for type uuid/i.test(m))
+      return 'Data belum termuat sepenuhnya. Muat ulang halaman, lalu coba lagi.';
+    if (/violates row-level security|permission denied/i.test(m))
+      return 'Kamu belum punya akses untuk tindakan ini.';
+    if (/duplicate key|already exists/i.test(m))
+      return 'Data ini sudah ada sebelumnya.';
+    if (/violates foreign key/i.test(m))
+      return 'Data yang dituju tidak ditemukan. Mungkin sudah dihapus.';
+    if (/JWT|token/i.test(m))
+      return 'Sesi berakhir. Silakan masuk kembali.';
+    return m;
   }
   const D = () => w.DATA || {};
 
@@ -138,15 +150,25 @@
      *                   tetap bisa ditelusuri tanpa database.
      */
     async guard() {
-      if (!sb) {
-        if (!store.get('user', null)) {
-          store.set('user', { name: 'Pengunjung', role: 'Pemuda' });
+      try {
+        if (!sb) {
+          if (!store.get('user', null)) {
+            store.set('user', { name: 'Pengunjung', role: 'Pemuda' });
+          }
+          return auth.me();
         }
-        return auth.me();
+        const s = await auth.session();
+        if (!s) { location.replace('index.html'); return null; }
+        const profil = await auth.me();
+        // sesi ada tapi profil belum terbaca (mis. jaringan lambat):
+        // jangan hentikan halaman, pakai data seadanya dulu
+        return profil || { id: s.user && s.user.id, full_name: 'Anggota', role: 'member' };
+      } catch (e) {
+        console.error('[SGKConnect] guard:', e);
+        w.SGK && w.SGK.toast && w.SGK.toast(
+          'Gagal memuat data akun. Periksa koneksi, lalu muat ulang halaman.');
+        return null;
       }
-      const s = await auth.session();
-      if (!s) { location.replace('index.html'); return null; }
-      return auth.me();
     }
   };
 
