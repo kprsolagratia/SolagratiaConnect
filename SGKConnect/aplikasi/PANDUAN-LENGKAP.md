@@ -369,7 +369,13 @@ Tunggu beberapa detik. Buka `https://github.com/USERNAME/sgkconnect` — berkas-
 # TAHAP 5 — Terbitkan ke internet (Cloudflare Pages)
 
 1. Masuk ke [dash.cloudflare.com](https://dash.cloudflare.com)
-2. Menu kiri → **Compute (Workers)** → **Workers & Pages** → **Create** → tab **Pages** → **Connect to Git**
+2. Menu kiri → **Compute (Workers)** → **Workers & Pages** → **Create**
+   → **pilih tab "Pages"**, bukan "Workers" → **Connect to Git**
+
+> **Ini bagian yang paling sering keliru.** Kalau memilih Workers, deploy akan gagal
+> dengan pesan *"Could not detect a directory containing static files"*. Kalau
+> terlanjur, hapus proyeknya lalu ulangi dari tab Pages — atau ikuti pilihan A di
+> `DEPLOY.md`.
 3. Klik **Connect GitHub**, izinkan aksesnya
    - Pilih **Only select repositories** → pilih `sgkconnect` → **Install & Authorize**
 4. Pilih repo `sgkconnect` → **Begin setup**

@@ -16,7 +16,7 @@ Legenda:
 | Daftar & masuk akun | Email + kata sandi lewat Supabase Auth |
 | Lupa kata sandi | Tautan pemulihan dikirim ke email |
 | Nomor anggota otomatis | Format `SGK-2026-00001`, dibuat saat daftar |
-| Peran anggota/pemimpin/pengurus | Panel admin menolak yang bukan pengurus |
+| Peran anggota/pemimpin/pendeta/pengurus | Panel admin menolak yang bukan pengurus |
 | Renungan harian | Diambil per tanggal dari tabel `devotions` |
 | Rencana baca 365 hari | Centang harian tersimpan, progres lintas perangkat |
 | Dinding doa | Kirim permohonan, bisa anonim |
@@ -36,7 +36,7 @@ Legenda:
 | Dasbor admin | Jumlah anggota, kegiatan, doa, kehadiran — semua nyata |
 | Grafik kehadiran | Dihitung dari data check-in 7 bulan terakhir |
 | Ekspor CSV | Data anggota sungguhan, bisa dibuka di Excel |
-| Ubah peran anggota | Lewat panel admin, dengan pengaman di database |
+| Ubah peran anggota | Anggota · Pemimpin · Pendeta · Pengurus, dengan pengaman di database |
 | Kelola kegiatan | Tambah, ubah, hapus dari halaman Kelola Konten |
 | Kelola renungan | Termasuk penjadwalan per tanggal |
 | Kelola pengumuman | Tambah, ubah, hapus |
@@ -57,6 +57,10 @@ Legenda:
 | Ulang tahun otomatis | Diambil dari tanggal lahir yang diizinkan tampil |
 | Galeri foto | Halaman tersendiri, penampil layar penuh, geser kiri-kanan |
 | Unduh foto | Satu per satu, atau pilih beberapa lalu unduh sekaligus |
+| Forum diskusi | Buat topik, balas, hapus milik sendiri, pembaruan langsung |
+| Obrolan kelompok | Chat di dalam kelompok sel & tim, hanya anggota yang bisa baca |
+| Banner kegiatan | Tiap acara bisa pakai foto/poster sendiri |
+| Latar beranda | Gambar atau video, diatur dari Kelola Konten |
 | Keluar akun | Sesi dihapus dengan benar |
 | Mode gelap | Tersimpan per perangkat |
 | PWA & offline | Bisa dipasang di layar utama |
@@ -69,7 +73,6 @@ Bagian ini tampil dengan data contoh. Aman untuk demo, tapi jangan diklaim sudah
 
 | Fitur | Yang perlu dikerjakan |
 |---|---|
-| Forum diskusi | Tabel `forum_topics` & `forum_replies` sudah ada; tombol "Buat topik" dan halaman balasan belum dibuat |
 | Ulang tahun | Kolom `birthday` sudah ada di `profiles`; kueri "ulang tahun bulan ini" belum dibuat |
 | Penanda & sorotan Alkitab | Perlu tabel `bookmarks` |
 | Teks Alkitab lengkap | Perlu sumber teks berlisensi (mis. API Alkitab) — jangan salin dari situs berhak cipta |

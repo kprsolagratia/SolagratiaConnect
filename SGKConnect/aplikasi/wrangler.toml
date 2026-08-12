@@ -33,3 +33,13 @@ for = "/assets/js/config.js"
 for = "/sw.js"
 [assets.headers.values]
 "Cache-Control" = "no-store"
+
+[[assets.headers]]
+for = "/*.html"
+[assets.headers.values]
+"Cache-Control" = "no-cache"
+
+[[assets.headers]]
+for = "/assets/js/*"
+[assets.headers.values]
+"Cache-Control" = "no-cache"

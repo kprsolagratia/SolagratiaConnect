@@ -66,7 +66,16 @@ Kalau belum punya repo: buka [github.com/new](https://github.com/new), nama `sgk
 
 ---
 
-## Bagian 3 — Cloudflare Pages
+## Bagian 3 — Cloudflare
+
+Cloudflare punya dua jenis proyek: **Pages** (untuk situs statis) dan **Workers**
+(untuk aplikasi server). SGKConnect adalah situs statis, jadi **Pages** yang tepat.
+
+Kalau terlanjur terbuat sebagai Worker dan muncul galat
+*"Could not detect a directory containing static files"*, lihat bagian
+**Memperbaiki proyek Worker** di bawah.
+
+### Cloudflare Pages
 
 1. Masuk ke [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
 2. Pilih repo `sgkconnect`, klik **Begin setup**
@@ -85,6 +94,37 @@ Kalau belum punya repo: buka [github.com/new](https://github.com/new), nama `sgk
 5. **Save and Deploy**. Sekitar 1 menit, situs terbit di `https://sgkconnect.pages.dev`
 
 Berkas `_headers` dan `_redirects` sudah disertakan, jadi header keamanan dan cache aktif otomatis.
+
+### Memperbaiki proyek Worker
+
+Kalau proyek sudah terlanjur dibuat sebagai Worker, ada dua pilihan.
+
+**Pilihan A — pakai berkas wrangler.toml (tanpa membuat ulang)**
+
+Berkas `wrangler.toml` sudah disertakan di proyek ini. Cukup commit dan push,
+lalu di dashboard Worker → **Settings** → **Build**:
+
+| Kolom | Isi |
+|---|---|
+| Build command | `node build.js` |
+| Deploy command | `npx wrangler deploy` |
+
+Lalu **Settings** → **Variables and Secrets**, tambahkan `SUPABASE_URL` dan
+`SUPABASE_ANON_KEY`. Pastikan dicentang agar tersedia **saat build**, bukan hanya
+saat berjalan — nilainya dibaca oleh `build.js`.
+
+Klik **Retry deployment**.
+
+**Pilihan B — buat ulang sebagai Pages (lebih disarankan)**
+
+1. Dashboard → Worker `solagratiaconnect` → **Settings** → gulir ke bawah → **Delete**
+2. **Workers & Pages** → **Create** → tab **Pages** → **Connect to Git**
+3. Pilih repo yang sama, isi seperti tabel di Bagian 3 di atas
+4. Jangan lupa tambahkan environment variables sebelum Deploy
+
+Pages lebih cocok karena dirancang khusus untuk situs statis: tidak perlu
+`wrangler.toml`, header dari `_headers` otomatis dipakai, dan setiap commit
+dapat URL pratinjau sendiri.
 
 ### 3.1 Kembali ke Supabase
 Setelah dapat URL, ulangi **langkah 1.3** dan isi **Site URL** serta **Redirect URLs** dengan alamat asli tadi. Tanpa ini, tautan konfirmasi email akan gagal.

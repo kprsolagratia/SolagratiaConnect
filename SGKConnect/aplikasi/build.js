@@ -66,6 +66,20 @@ if (/service_role/.test(cfg.SUPABASE_ANON_KEY)) {
 if (!!cfg.SUPABASE_URL !== !!cfg.SUPABASE_ANON_KEY) {
   galat.push('SUPABASE_URL dan SUPABASE_ANON_KEY harus diisi keduanya, atau dikosongkan keduanya.');
 }
+// Pengaman: bila environment variable kosong TAPI config.js yang ada sudah
+// terisi, jangan ditimpa. Ini melindungi pemakai yang memilih menaruh
+// kredensial langsung di config.js (cara sederhana, lihat README).
+if (!cfg.SUPABASE_URL && fs.existsSync(OUT)) {
+  const lama = fs.readFileSync(OUT, 'utf8');
+  const cocok = lama.match(/"SUPABASE_URL":\s*"(https:\/\/[^"]+)"/);
+  if (cocok) {
+    console.log('\n  config.js sudah terisi dan environment variable kosong.');
+    console.log('  Berkas dibiarkan apa adanya — tidak ditimpa.');
+    console.log('  Supabase: ' + cocok[1] + '\n');
+    process.exit(0);
+  }
+}
+
 if (!cfg.SUPABASE_URL) {
   peringatan.push('Kredensial Supabase kosong — aplikasi akan berjalan dalam MODE DEMO.');
 }

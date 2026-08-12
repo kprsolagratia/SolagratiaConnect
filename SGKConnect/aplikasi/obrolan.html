@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Obrolan Kelompok · SGKConnect</title>
+<meta name="theme-color" content="#102A43">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<link rel="stylesheet" href="assets/css/app.css?v=25">
+<style>
+  .obrolan{display:grid;grid-template-columns:280px 1fr;gap:16px;min-height:0;flex:1}
+  .daftar-grup{display:flex;flex-direction:column;gap:8px}
+  .grup{
+    display:flex;gap:11px;align-items:center;padding:12px;border-radius:14px;
+    background:var(--surface);border:1px solid var(--line);cursor:pointer;transition:.2s
+  }
+  .grup:hover{border-color:var(--gold)}
+  .grup.aktif{background:var(--navy);border-color:var(--navy)}
+  .grup.aktif h4,.grup.aktif p{color:#fff}
+  .grup .th{width:42px;height:42px;border-radius:12px;overflow:hidden;flex:none}
+
+  .ruang{display:flex;flex-direction:column;background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;min-height:0}
+  .ruang-atas{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;
+    gap:12px;align-items:center}
+  .pesan-wadah{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px;
+    min-height:320px;max-height:calc(100vh - 300px)}
+  .pesan{display:flex;gap:10px;max-width:78%}
+  .pesan .avatar{width:32px;height:32px;flex:none}
+  .gelembung{background:var(--gray);border:1px solid var(--line);border-radius:4px 15px 15px 15px;
+    padding:10px 14px;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+  .pesan.saya{align-self:flex-end;flex-direction:row-reverse}
+  .pesan.saya .gelembung{background:var(--navy);color:#fff;border-color:var(--navy);
+    border-radius:15px 4px 15px 15px}
+  .pesan .nama{font-family:Poppins;font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:3px}
+  .pesan .jam{font-size:10.5px;color:var(--muted);margin-top:4px}
+  .pesan.saya .jam{text-align:right}
+  .hari{text-align:center;font-size:11px;color:var(--muted);margin:4px 0}
+  .kirim{padding:14px 18px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line);
+    display:flex;gap:10px;align-items:flex-end}
+  .kirim textarea{flex:1;min-height:44px;max-height:130px;padding:12px 14px;border-radius:14px;
+    border:1px solid var(--line);background:var(--bg);font:inherit;font-size:14px;
+    color:var(--ink);resize:none;outline:none}
+  .kirim textarea:focus{border-color:var(--gold)}
+  .hapus-pesan{font-size:10.5px;color:var(--muted);text-decoration:underline;margin-top:3px}
+  @media(max-width:860px){
+    .obrolan{grid-template-columns:1fr}
+    .daftar-grup.sembunyi{display:none}
+    .ruang.sembunyi{display:none}
+    .pesan{max-width:88%}
+    .pesan-wadah{max-height:calc(100vh - 260px)}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="ico-btn burger" aria-label="Buka menu" data-icon="menu"></button>
+      <div class="spacer" style="flex:1"></div>
+      <button class="ico-btn" data-lang-toggle style="font-family:Poppins;font-size:11.5px;font-weight:600">ID</button>
+      <button class="ico-btn" data-theme-toggle aria-label="Ganti tema"></button>
+      <div class="avatar" data-scene="face"></div>
+    </header>
+
+    <section class="rise">
+      <div class="eyebrow">Koinonia</div>
+      <h1 style="margin-top:8px">Obrolan Kelompok</h1>
+      <p class="muted small" style="margin-top:8px">
+        Percakapan hanya terbaca oleh anggota kelompok yang sama.</p>
+    </section>
+
+    <div class="obrolan rise">
+      <aside class="daftar-grup" id="daftarGrup"></aside>
+
+      <section class="ruang sembunyi" id="ruang">
+        <div class="ruang-atas">
+          <button class="ico-btn" id="kembaliGrup" data-icon="menu"
+            style="display:none" aria-label="Kembali ke daftar"></button>
+          <div class="th" id="grupFoto" style="width:38px;height:38px;border-radius:11px;
+            overflow:hidden" data-scene="fellow"></div>
+          <div style="flex:1;min-width:0">
+            <h3 id="grupNama" style="font-size:16px"></h3>
+            <p class="small muted" id="grupKet"></p>
+          </div>
+        </div>
+
+        <div class="pesan-wadah" id="pesan"></div>
+
+        <div class="kirim">
+          <textarea id="isiPesan" rows="1" placeholder="Tulis pesan…" aria-label="Tulis pesan"></textarea>
+          <button class="btn btn-gold" id="btnKirim" style="padding:12px 18px">Kirim</button>
+        </div>
+      </section>
+
+      <section class="card" id="kosong" style="display:grid;place-items:center;text-align:center;padding:50px 24px">
+        <div>
+          <p class="muted" id="pesanKosong">Memuat…</p>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<nav class="mobile-nav"></nav>
+
+<script src="assets/js/supabase.min.js"></script>
+<script src="assets/js/config.js?v=25"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/obrolan.js"></script>
+</body>
+</html>

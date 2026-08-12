@@ -1,0 +1,15 @@
+# konfigurasi lokal — tidak boleh ikut ter-commit
+.env
+.env.local
+.env.*.local
+
+# Catatan: assets/js/config.js SENGAJA tidak diabaikan.
+# Kunci "anon" Supabase memang dirancang boleh publik — keamanan
+# dijaga Row Level Security di database, bukan kerahasiaan kunci ini.
+# Kalau Anda memakai environment variable di Cloudflare, boleh
+# menambahkan kembali baris:  assets/js/config.js
+
+node_modules/
+dist/
+.DS_Store
+.vscode/

@@ -11,17 +11,17 @@
      • Panggilan API Supabase          → tidak disentuh sama sekali
    ============================================================ */
 
-const VERSION = 'sgk-v21';
+const VERSION = 'sgk-v25';
 
 /* Berkas yang disimpan supaya aplikasi tetap terbuka saat offline. */
 const ASSETS = [
   './', 'index.html', 'beranda.html', 'kegiatan.html', 'alkitab.html', 'doa.html',
   'komunitas.html', 'profil.html', 'admin.html', 'kelola.html', 'galeri.html',
-  'publik.html', 'konsep.html', '404.html',
+  'publik.html', 'forum.html', 'obrolan.html', 'konsep.html', '404.html',
   'assets/css/app.css',
   'assets/js/ui.js', 'assets/js/app.js', 'assets/js/data.js', 'assets/js/db.js',
   'assets/js/kelola.js', 'assets/js/i18n.js', 'assets/js/publik.js',
-  'assets/js/galeri.js', 'assets/js/supabase.min.js',
+  'assets/js/galeri.js', 'assets/js/forum.js', 'assets/js/obrolan.js', 'assets/js/supabase.min.js',
   'assets/img/logo-mark.png', 'assets/img/logo-mark-light.png',
   'assets/img/logo-lockup.png', 'assets/img/icon-192.png', 'assets/img/favicon.png',
   'manifest.webmanifest'

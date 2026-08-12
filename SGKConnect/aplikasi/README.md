@@ -18,6 +18,8 @@ sgkconnect/
 ├── komunitas.html        Kelompok sel, tim pelayanan, forum, galeri
 ├── profil.html           Kartu anggota digital + QR + statistik
 ├── admin.html            Dasbor pengurus + grafik + ekspor CSV/PDF
+├── forum.html            Forum diskusi
+├── obrolan.html          Obrolan per kelompok sel / tim
 ├── galeri.html           Galeri foto — lihat & unduh
 ├── kelola.html           Kelola isi aplikasi (khusus pengurus)
 ├── publik.html           Halaman terbuka untuk umum, tanpa perlu masuk
@@ -28,6 +30,10 @@ sgkconnect/
 │   ├── schema-2-media.sql      Galeri, media, pengaturan, Storage
 │   ├── schema-3-publik.sql     Membuka sebagian isi untuk pengunjung umum
 │   ├── schema-4-biodata.sql    Biodata anggota & foto profil
+│   ├── schema-5-banner.sql     Banner kegiatan & izin forum
+│   ├── schema-6-hero.sql       Latar beranda: gambar atau video
+│   ├── schema-7-peran.sql      Peran Pendeta
+│   └── schema-8-chat.sql       Obrolan kelompok
 │   ├── jadikan-admin.sql       Mengatur peran pengurus
 │   ├── bersihkan-duplikat.sql  Bila schema.sql pernah dijalankan berulang
 │   └── reset-total.sql         Hapus semua lalu mulai ulang dari nol
@@ -141,7 +147,18 @@ Arahkan domain (mis. `sgkconnect.gkkai-sendawar.org`) ke penyedia hosting di ata
 
 ## Konfigurasi
 
-Kredensial tidak pernah disimpan di dalam kode. Alurnya:
+Ada dua cara. Pilih salah satu.
+
+**Cara A — langsung di config.js (paling sederhana)**
+
+Buka `assets/js/config.js`, isi dua baris pertama, commit seperti biasa.
+Tidak perlu build command, tidak perlu environment variable di hosting.
+Aman karena kunci `anon` memang dirancang publik — yang menjaga data adalah
+Row Level Security di Postgres.
+
+**Cara B — lewat environment variable (kredensial tidak masuk repo)**
+
+Alurnya:
 
 ```
 .env  (lokal, tidak di-commit)          ┐
@@ -155,6 +172,9 @@ dengan pesan yang jelas, bukan diam-diam menghasilkan aplikasi rusak.
 
 Kalau keduanya kosong, aplikasi berjalan dalam mode demo. Itu perilaku yang disengaja,
 supaya proyek bisa dibuka siapa saja tanpa perlu database.
+
+`build.js` tidak akan menimpa `config.js` yang sudah terisi, jadi Cara A dan Cara B
+bisa hidup berdampingan tanpa saling merusak.
 
 ## Kecepatan
 
