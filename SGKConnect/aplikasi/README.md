@@ -33,7 +33,8 @@ sgkconnect/
 │   ├── schema-5-banner.sql     Banner kegiatan & izin forum
 │   ├── schema-6-hero.sql       Latar beranda: gambar atau video
 │   ├── schema-7-peran.sql      Peran Pendeta
-│   └── schema-8-chat.sql       Obrolan kelompok
+│   ├── schema-8-chat.sql       Obrolan kelompok
+│   └── schema-9-perbaikan.sql  Perbaikan izin (WAJIB dijalankan)
 │   ├── jadikan-admin.sql       Mengatur peran pengurus
 │   ├── bersihkan-duplikat.sql  Bila schema.sql pernah dijalankan berulang
 │   └── reset-total.sql         Hapus semua lalu mulai ulang dari nol

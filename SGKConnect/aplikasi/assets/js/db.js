@@ -62,10 +62,15 @@
     };
     if (peta[m]) return peta[m];
     // pesan teknis dari database diubah jadi kalimat yang bisa dipahami
-    if (/invalid input syntax for type uuid/i.test(m))
+    if (/invalid input syntax for type (uuid|integer|bigint|numeric|date|timestamp)/i.test(m))
       return 'Data belum termuat sepenuhnya. Muat ulang halaman, lalu coba lagi.';
-    if (/violates row-level security|permission denied/i.test(m))
+    if (/violates row-level security|permission denied/i.test(m)) {
+      if (/attendance/i.test(m))       return 'Kehadiran gagal dicatat. Jalankan schema-9-perbaikan.sql di Supabase.';
+      if (/group_members/i.test(m))    return 'Permintaan gabung gagal. Jalankan schema-9-perbaikan.sql di Supabase.';
+      if (/rsvps|prayer_supports|reading_progress/i.test(m))
+        return 'Tindakan gagal disimpan. Jalankan schema-9-perbaikan.sql di Supabase.';
       return 'Kamu belum punya akses untuk tindakan ini.';
+    }
     if (/duplicate key|already exists/i.test(m))
       return 'Data ini sudah ada sebelumnya.';
     if (/violates foreign key/i.test(m))
@@ -272,6 +277,12 @@
     },
 
     async create(title, body, isAnon) {
+      title = String(title || '').trim();
+      body  = String(body  || '').trim();
+      if (!title) throw new Error('Judul pokok doa perlu diisi.');
+      if (!body)  throw new Error('Isi permohonan perlu diisi.');
+      if (title.length > 200)  throw new Error('Judul terlalu panjang (maksimal 200 huruf).');
+      if (body.length  > 2000) throw new Error('Permohonan terlalu panjang (maksimal 2000 huruf).');
       if (!sb) {
         const p = { id: 'u' + Date.now(), judul: title, isi: body, anonim: !!isAnon, jml: 0, waktu: 'baru saja', oleh: 'Saya' };
         store.set('myPrayers', [p].concat(store.get('myPrayers', [])));
@@ -285,6 +296,9 @@
     },
 
     async addNote(prayerId, body) {
+      body = String(body || '').trim();
+      if (!body) throw new Error('Pesan kosong.');
+      if (body.length > 1000) throw new Error('Pesan terlalu panjang (maksimal 1000 huruf).');
       if (!sb) return { demo: true };
       const user = await pengguna();
       const { error } = await sb.from('prayer_notes').insert({ prayer_id: prayerId, user_id: user.id, body });
@@ -331,6 +345,11 @@
     },
 
     async toggleDay(day) {
+      const n = Number(day);
+      if (!Number.isInteger(n) || n < 1 || n > 365) {
+        throw new Error('Nomor hari bacaan tidak sah.');
+      }
+      day = n;
       if (!sb) { const r = store.get('reads', {}); r[day] = !r[day]; store.set('reads', r); return r[day]; }
       const user = await pengguna();
       const { data: ada } = await sb.from('reading_progress').select('day')
@@ -432,6 +451,11 @@
     },
 
     async createTopic(title, body) {
+      title = String(title || '').trim();
+      body  = String(body  || '').trim();
+      if (!title) throw new Error('Judul topik perlu diisi.');
+      if (title.length > 200)  throw new Error('Judul terlalu panjang (maksimal 200 huruf).');
+      if (body.length  > 5000) throw new Error('Isi terlalu panjang (maksimal 5000 huruf).');
       if (!sb) { w.SGK?.toast('Mode demo — topik tidak tersimpan.'); return null; }
       const user = await pengguna();
       const { data, error } = await sb.from('forum_topics')
@@ -441,6 +465,9 @@
     },
 
     async reply(topicId, body) {
+      body = String(body || '').trim();
+      if (!body) throw new Error('Balasan kosong.');
+      if (body.length > 3000) throw new Error('Balasan terlalu panjang (maksimal 3000 huruf).');
       if (!sb) { w.SGK?.toast('Mode demo — balasan tidak tersimpan.'); return null; }
       const user = await pengguna();
       const { data, error } = await sb.from('forum_replies')

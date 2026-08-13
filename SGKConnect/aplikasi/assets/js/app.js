@@ -14,6 +14,8 @@
   const POLA_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   /** Saat tersambung database, id harus UUID. Id contoh seperti "e1" ditolak. */
   const idSah = id => !w.DB || !w.DB.live || POLA_UUID.test(String(id || ''));
+  /** Nomor hari rencana baca: harus angka bulat 1–365. */
+  const hariSah = d => { const n = Number(d); return Number.isInteger(n) && n >= 1 && n <= 365; };
 
   /* --- RSVP --- */
   let rsvpCache = null;
@@ -90,9 +92,10 @@
         btn.innerHTML = on ? S.icon('check', 16) + 'Selesai dibaca' : 'Tandai selesai';
       };
       btn.addEventListener('click', async () => {
+        if (!hariSah(id)) { S.toast('Bacaan belum termuat. Coba lagi sebentar.'); return; }
         btn.disabled = true;
         try {
-          const on = await w.DB.bible.toggleDay(id);
+          const on = await w.DB.bible.toggleDay(Number(id));
           readCache[id] = on; paint();
           if (on) S.toast(S.t('pesan.bacaanSelesai'));
         } finally { btn.disabled = false; }

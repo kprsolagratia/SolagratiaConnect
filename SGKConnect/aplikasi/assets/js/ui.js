@@ -223,8 +223,7 @@
             data-nama="${t(l)}">${icon(i, 18)}<span>${t(l)}</span></a>`).join('')}
         <a class="nav-i" href="index.html" data-logout data-nama="${t('nav.keluar')}">
           ${icon('out', 18)}<span>${t('nav.keluar')}</span></a>
-        <button class="lipat-btn" data-lipat aria-label="Sembunyikan menu">
-          ${icon('menu', 15)}<span>Sembunyikan</span></button>
+
         <div class="side-user">
           <div class="avatar"${foto ? '' : ' data-scene="face"'}>${foto
             ? `<img src="${foto}" alt="" style="width:100%;height:100%;object-fit:cover">` : ''}</div>
@@ -280,20 +279,6 @@
         if (w.App && w.App.logout) w.App.logout(); else location.href = 'index.html';
       });
     });
-    /* ---------- lipat / buka sidebar (tersimpan antar kunjungan) ---------- */
-    const pasangRail = keadaan => {
-      document.documentElement.setAttribute('data-rail', keadaan);
-      store.set('rail', keadaan);
-      document.querySelectorAll('[data-lipat] span').forEach(sp =>
-        sp.textContent = keadaan === 'lipat' ? 'Tampilkan' : 'Sembunyikan');
-    };
-    pasangRail(store.get('rail', 'buka'));
-    document.querySelectorAll('[data-lipat]').forEach(b => {
-      if (b.dataset.bound) return; b.dataset.bound = '1';
-      b.addEventListener('click', () =>
-        pasangRail(store.get('rail', 'buka') === 'lipat' ? 'buka' : 'lipat'));
-    });
-
     if (foto) {
       document.querySelectorAll('.topbar .avatar').forEach(a => {
         a.removeAttribute('data-scene');
