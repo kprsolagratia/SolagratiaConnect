@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-192.png">
-<link rel="stylesheet" href="assets/css/app.css?v=28">
+<link rel="stylesheet" href="assets/css/app.css?v=30">
 </head>
 <body>
 <div class="shell">
@@ -38,7 +38,7 @@
         <div class="ref" style="margin:10px 0 16px" id="rRef"></div>
         <p style="font-size:14.5px;line-height:1.8" id="rBody"></p>
         <div class="row wrap" style="margin-top:18px">
-          <button class="btn btn-navy" data-read="renungan-hari-ini">Tandai selesai</button>
+          <button class="btn btn-navy" id="selesaiRenungan">Sudah dibaca</button>
           <button class="btn btn-line" id="shareR" data-t="umum.bagikan">Bagikan</button>
           <span class="chip" id="rAuthor"></span>
         </div>
@@ -79,7 +79,7 @@
 <nav class="mobile-nav"></nav>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=28"></script>
+<script src="assets/js/config.js?v=30"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -109,6 +109,25 @@
       rBody.textContent = r.body || '';
       rAuthor.textContent = r.author || 'Tim Renungan';
       shareR.addEventListener('click', () => App.share(r.title + ' — ' + (r.verse_ref||'')));
+
+      /* Renungan harian ditandai per tanggal di perangkat.
+         Ini terpisah dari rencana baca 365 hari yang tersimpan di database. */
+      const kunciHari = 'renungan:' + (r.publish_on || new Date().toISOString().slice(0,10));
+      const sudah = () => !!SGK.store.get('renunganSelesai', {})[kunciHari];
+      const gambarTombol = () => {
+        selesaiRenungan.innerHTML = sudah()
+          ? SGK.icon('check', 16) + 'Sudah dibaca'
+          : 'Sudah dibaca';
+        selesaiRenungan.setAttribute('aria-pressed', sudah());
+      };
+      gambarTombol();
+      selesaiRenungan.addEventListener('click', () => {
+        const c = SGK.store.get('renunganSelesai', {}) || {};
+        c[kunciHari] = !c[kunciHari];
+        SGK.store.set('renunganSelesai', c);
+        gambarTombol();
+        if (c[kunciHari]) SGK.toast('Renungan hari ini ditandai selesai.');
+      });
     }
 
 

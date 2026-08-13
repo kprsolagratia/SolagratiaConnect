@@ -60,6 +60,7 @@ Legenda:
 | Forum diskusi | Buat topik, balas, hapus milik sendiri, pembaruan langsung |
 | Obrolan kelompok | Chat di dalam kelompok sel & tim, hanya anggota yang bisa baca |
 | Tanda "ada yang baru" | Titik merah di menu Obrolan, Forum, Doa, Kegiatan, Galeri |
+| Renungan harian ditandai | Tersimpan per tanggal di perangkat, terpisah dari rencana baca |
 | Banner kegiatan | Tiap acara bisa pakai foto/poster sendiri |
 | Latar beranda | Gambar atau video, diatur dari Kelola Konten |
 | Keluar akun | Sesi dihapus dengan benar |
