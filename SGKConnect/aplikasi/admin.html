@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-192.png">
-<link rel="stylesheet" href="assets/css/app.css?v=31">
+<link rel="stylesheet" href="assets/css/app.css?v=35">
 </head>
 <body>
 <div class="shell">
@@ -76,14 +76,16 @@
         </article>
         <article class="card">
           <div class="lab">Progres baca jemaat</div>
-          <div class="row-b small" style="margin-top:12px"><span>Rata-rata target 365 hari</span><b>65%</b></div>
-          <div class="prog"><i style="width:65%"></i></div>
-          <p class="small muted" style="margin-top:8px">236 dari 365 hari · 168 anggota aktif membaca</p>
+          <div class="row-b small" style="margin-top:12px">
+            <span>Rata-rata target 365 hari</span><b id="bacaPct">—</b></div>
+          <div class="prog"><i id="bacaBar" style="width:0"></i></div>
+          <p class="small muted" style="margin-top:8px" id="bacaKet">Memuat…</p>
           <div class="hairline"></div>
           <div class="lab">Laporan siap kirim</div>
           <div class="row" style="margin-top:12px">
             <button class="btn btn-navy btn-sm" style="flex:1" id="repBtn">Laporan bulanan</button>
-            <button class="btn btn-line btn-sm" style="flex:1" id="annBtn">Kirim pengumuman</button>
+            <a class="btn btn-line btn-sm" style="flex:1;justify-content:center"
+               href="kelola.html">Buat pengumuman</a>
           </div>
         </article>
       </div>
@@ -93,7 +95,7 @@
 <nav class="mobile-nav"></nav>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=31"></script>
+<script src="assets/js/config.js?v=35"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -163,6 +165,20 @@
     }
 
     const evs = evsRaw || [];
+
+    /* progres baca jemaat — dari data sungguhan */
+    try {
+      const baca = await DB.stats.readingOverview();
+      bacaPct.textContent = baca.rata + '%';
+      bacaBar.style.width = Math.min(100, baca.rata) + '%';
+      bacaKet.textContent = baca.pembaca
+        ? `Rata-rata ${baca.hari} dari ${baca.total} hari · ` +
+          `${baca.pembaca} dari ${baca.anggota} anggota sudah mulai membaca`
+        : 'Belum ada anggota yang menandai bacaan.';
+    } catch (e) {
+      bacaPct.textContent = '—';
+      bacaKet.textContent = 'Data belum bisa dimuat.';
+    }
     if (evs.length) SGK.bars(bars, evs.slice(0,5).map(e => [e.title, e.going || 0]));
     else bars.innerHTML = '<p class="small muted">Belum ada kegiatan terjadwal.</p>';
 
@@ -247,8 +263,44 @@
   }
   xlsBtn.addEventListener('click', csv);
   pdfBtn.addEventListener('click', () => { SGK.toast('Menyiapkan versi cetak…'); setTimeout(() => window.print(), 400); });
-  repBtn.addEventListener('click', () => SGK.toast('Laporan bulanan dibuat.'));
-  annBtn.addEventListener('click', () => SGK.toast('Pengumuman dikirim ke seluruh anggota.'));
+  repBtn.addEventListener('click', async () => {
+    repBtn.disabled = true;
+    try {
+      const r = await DB.stats.monthlyReport();
+      if (!r) { SGK.toast('Laporan hanya tersedia bila tersambung ke database.'); return; }
+
+      const daftarKegiatan = r.kegiatan.length
+        ? r.kegiatan.map(k => `<div class="row-b small" style="padding:5px 0">
+             <span>${k.title}</span>
+             <span class="muted">${new Date(k.starts_at)
+               .toLocaleDateString('id-ID', { day:'numeric', month:'short' })}</span></div>`).join('')
+        : '<p class="small muted">Tidak ada kegiatan bulan ini.</p>';
+
+      const m = SGK.modal(`
+        <div class="lab">Laporan bulanan</div>
+        <h3 style="margin:8px 0 16px">${r.bulan}</h3>
+        <div style="text-align:left">
+          <div class="row-b" style="padding:7px 0;border-bottom:1px solid var(--line)">
+            <span class="small">Jumlah anggota</span><b>${r.anggota}</b></div>
+          <div class="row-b" style="padding:7px 0;border-bottom:1px solid var(--line)">
+            <span class="small">Anggota baru bulan ini</span><b>${r.anggotaBaru}</b></div>
+          <div class="row-b" style="padding:7px 0;border-bottom:1px solid var(--line)">
+            <span class="small">Kehadiran tercatat</span><b>${r.kehadiran}</b></div>
+          <div class="row-b" style="padding:7px 0;border-bottom:1px solid var(--line)">
+            <span class="small">Pokok doa masuk</span><b>${r.pokokDoa}</b></div>
+          <div class="lab" style="margin-top:16px">Kegiatan bulan ini</div>
+          <div style="margin-top:6px">${daftarKegiatan}</div>
+        </div>
+        <div class="row" style="margin-top:18px">
+          <button class="btn btn-line" style="flex:1" data-close>Tutup</button>
+          <button class="btn btn-gold" style="flex:1" id="cetakLaporan">Cetak / PDF</button>
+        </div>`);
+      m.el.querySelector('.box').style.maxWidth = '440px';
+      m.el.querySelector('#cetakLaporan').addEventListener('click', () => window.print());
+    } catch (e) {
+      SGK.toast('Laporan belum bisa dibuat.');
+    } finally { repBtn.disabled = false; }
+  });
 </script>
 </body>
 </html>

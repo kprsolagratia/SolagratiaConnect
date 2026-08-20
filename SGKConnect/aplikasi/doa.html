@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-192.png">
-<link rel="stylesheet" href="assets/css/app.css?v=31">
+<link rel="stylesheet" href="assets/css/app.css?v=35">
 </head>
 <body>
 <div class="shell">
@@ -68,7 +68,7 @@
         <article class="card">
           <div class="lab" data-t="doa.statistik">Statistik doa</div>
           <div class="row-b" style="margin-top:14px">
-            <div><span class="small muted">Permohonan bulan ini</span><b class="font-display" style="display:block;font-size:24px">142</b></div>
+            <div><span class="small muted">Permohonan bulan ini</span><b class="font-display" style="display:block;font-size:24px" id="doaBulanIni">—</b></div>
             <div><span class="small muted">Kamu doakan</span><b class="font-display" style="display:block;font-size:24px" id="myCount">0</b></div>
           </div>
           <div class="hairline"></div>
@@ -89,7 +89,7 @@
 <nav class="mobile-nav"></nav>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=31"></script>
+<script src="assets/js/config.js?v=35"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -143,6 +143,11 @@
     }));
     App.bindAll();
     myCount.textContent = Object.values(mineRaw || {}).filter(Boolean).length;
+
+    /* jumlah permohonan bulan ini — dihitung dari daftar yang termuat */
+    const awalBulan = new Date(); awalBulan.setDate(1); awalBulan.setHours(0,0,0,0);
+    const bulanIni = doa.filter(d => d.created_at && new Date(d.created_at) >= awalBulan).length;
+    doaBulanIni.textContent = DB.live ? bulanIni : doa.length;
   }
 
   (async function () {

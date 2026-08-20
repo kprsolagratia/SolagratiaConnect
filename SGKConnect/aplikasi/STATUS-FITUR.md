@@ -36,6 +36,8 @@ Legenda:
 | Dasbor admin | Jumlah anggota, kegiatan, doa, kehadiran — semua nyata |
 | Grafik kehadiran | Dihitung dari data check-in 7 bulan terakhir |
 | Ekspor CSV | Data anggota sungguhan, bisa dibuka di Excel |
+| Laporan bulanan | Anggota, anggota baru, kehadiran, pokok doa, kegiatan — bisa dicetak |
+| Progres baca jemaat | Dihitung dari data nyata, bukan angka contoh |
 | Ubah peran anggota | Anggota · Pemimpin · Pendeta · Pengurus, dengan pengaman di database |
 | Kelola kegiatan | Tambah, ubah, hapus dari halaman Kelola Konten |
 | Kelola renungan | Termasuk penjadwalan per tanggal |
@@ -61,6 +63,8 @@ Legenda:
 | Obrolan kelompok | Chat di dalam kelompok sel & tim, hanya anggota yang bisa baca |
 | Tanda "ada yang baru" | Titik merah di menu Obrolan, Forum, Doa, Kegiatan, Galeri |
 | Renungan harian ditandai | Tersimpan per tanggal di perangkat, terpisah dari rencana baca |
+| Daftar kitab Alkitab | 50 kitab, pilih pasal, buka teksnya |
+| Teks Alkitab dalam aplikasi | Siap pakai — tinggal isi kunci API resmi LAI di config.js |
 | Banner kegiatan | Tiap acara bisa pakai foto/poster sendiri |
 | Latar beranda | Gambar atau video, diatur dari Kelola Konten |
 | Keluar akun | Sesi dihapus dengan benar |
@@ -77,7 +81,7 @@ Bagian ini tampil dengan data contoh. Aman untuk demo, tapi jangan diklaim sudah
 |---|---|
 | Ulang tahun | Kolom `birthday` sudah ada di `profiles`; kueri "ulang tahun bulan ini" belum dibuat |
 | Penanda & sorotan Alkitab | Perlu tabel `bookmarks` |
-| Teks Alkitab lengkap | Perlu sumber teks berlisensi (mis. API Alkitab) — jangan salin dari situs berhak cipta |
+
 | Pengaturan notifikasi | Sakelar tampil tapi belum menyimpan |
 | Ekspor PDF | Memakai cetak peramban; belum laporan terformat |
 | Kirim pengumuman ke anggota | Pengumuman bisa dibuat, tapi belum ada notifikasi keluar |

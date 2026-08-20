@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-192.png">
-<link rel="stylesheet" href="assets/css/app.css?v=31">
+<link rel="stylesheet" href="assets/css/app.css?v=35">
 </head>
 <body>
 <div class="shell">
@@ -132,7 +132,7 @@
 <nav class="mobile-nav" aria-label="Navigasi utama"></nav>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=31"></script>
+<script src="assets/js/config.js?v=35"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -304,9 +304,21 @@
     SGK.paintScenes();
   })();
 
-  saveDev.addEventListener('click', () => SGK.toast('Renungan disimpan ke koleksimu.'));
+  saveDev.addEventListener('click', () => {
+    const kunci = 'renungan:' + new Date().toISOString().slice(0, 10);
+    const c = SGK.store.get('renunganDisimpan', {}) || {};
+    c[kunci] = !c[kunci];
+    SGK.store.set('renunganDisimpan', c);
+    saveDev.innerHTML = SGK.icon(c[kunci] ? 'check' : 'mark', 18);
+    SGK.toast(c[kunci] ? 'Renungan disimpan.' : 'Simpanan dibatalkan.');
+  });
   shareVs.addEventListener('click', () => App.share(vsText.textContent + ' — ' + vsRef.textContent));
-  greetBtn.addEventListener('click', () => SGK.toast('Ucapan terkirim.'));
+  greetBtn.addEventListener('click', () => {
+    const nama = (bdays.querySelector('h4') || {}).textContent || '';
+    if (!nama) { SGK.toast('Tidak ada yang berulang tahun bulan ini.'); return; }
+    const pesan = `Selamat ulang tahun, ${nama}! Tuhan Yesus memberkati.`;
+    window.open('https://wa.me/?text=' + encodeURIComponent(pesan), '_blank', 'noopener');
+  });
 </script>
 </body>
 </html>

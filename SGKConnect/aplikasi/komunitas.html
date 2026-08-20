@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-192.png">
-<link rel="stylesheet" href="assets/css/app.css?v=31">
+<link rel="stylesheet" href="assets/css/app.css?v=35">
 </head>
 <body>
 <div class="shell">
@@ -71,7 +71,7 @@
 <nav class="mobile-nav"></nav>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=31"></script>
+<script src="assets/js/config.js?v=35"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -157,7 +157,11 @@
     SGK.paintScenes();
   })();
 
-  liveBtn.addEventListener('click', () => SGK.toast('Streaming ibadah dimulai setiap Minggu 09.00.'));
+  liveBtn.addEventListener('click', async () => {
+    const md = await DB.community.media('stream', 1).catch(() => []);
+    if (md && md[0] && md[0].url) { window.open(md[0].url, '_blank', 'noopener'); return; }
+    SGK.toast('Belum ada tautan streaming. Pengurus dapat menambahkannya di Kelola Konten.');
+  });
 </script>
 </body>
 </html>

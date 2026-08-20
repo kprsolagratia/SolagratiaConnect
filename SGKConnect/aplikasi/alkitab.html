@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/icon-192.png">
-<link rel="stylesheet" href="assets/css/app.css?v=31">
+<link rel="stylesheet" href="assets/css/app.css?v=35">
 </head>
 <body>
 <div class="shell">
@@ -46,14 +46,12 @@
 
       <div class="stack">
         <article class="card">
-          <div class="row-b"><div class="lab" data-t="alkitab.rencana">Rencana baca 2026</div><b class="ref" id="planPct">65%</b></div>
-          <div class="prog"><i id="planBar" style="width:65%"></i></div>
+          <div class="row-b"><div class="lab" data-t="alkitab.rencana">Rencana baca 2026</div><b class="ref" id="planPct">—</b></div>
+          <div class="prog"><i id="planBar" style="width:0"></i></div>
           <p class="small muted" style="margin-top:8px" id="planNote"></p>
           <div class="hairline"></div>
           <div class="lab" data-t="alkitab.tantangan">Tantangan 365 hari</div>
-          <div class="row wrap" style="margin-top:10px">
-            <span class="badge b-gold">Beruntun 30 hari</span><span class="badge b-ok">Konsisten</span>
-          </div>
+          <div class="row wrap" style="margin-top:10px" id="lencanaBaca"></div>
         </article>
         <article class="card">
           <div class="lab" data-t="alkitab.penanda">Penanda & sorotan</div>
@@ -79,7 +77,7 @@
 <nav class="mobile-nav"></nav>
 
 <script src="assets/js/supabase.min.js"></script>
-<script src="assets/js/config.js?v=31"></script>
+<script src="assets/js/config.js?v=35"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/ui.js"></script>
@@ -135,7 +133,18 @@
     const pct = prog.total ? Math.round(prog.done / prog.total * 100) : 0;
     planPct.textContent = pct + '%';
     planBar.style.width = pct + '%';
-    planNote.textContent = prog.done + ' dari ' + prog.total + ' hari · sisa ' + (prog.total - prog.done) + ' hari';
+    planNote.textContent = prog.done
+      ? prog.done + ' dari ' + prog.total + ' hari · sisa ' + (prog.total - prog.done) + ' hari'
+      : 'Belum ada bacaan yang ditandai selesai.';
+
+    /* lencana muncul sesuai pencapaian sungguhan */
+    const lencana = [];
+    if (prog.done >= 7)   lencana.push(['b-gold', 'Beruntun ' + prog.done + ' hari']);
+    if (prog.done >= 30)  lencana.push(['b-ok', 'Konsisten']);
+    if (prog.done >= 100) lencana.push(['b-gold', '100 hari']);
+    lencanaBaca.innerHTML = lencana.length
+      ? lencana.map(([k, t]) => `<span class="badge ${k}">${t}</span>`).join('')
+      : '<p class="small muted">Tandai bacaan hari ini untuk mulai mengumpulkan lencana.</p>';
 
     marks.innerHTML = [['Mazmur 23:1','Sorotan emas'],['Roma 8:28','Penanda'],['Filipi 4:6-7','Sorotan emas']]
       .map((m,i) => `${i?'<div class="hairline"></div>':''}<div class="row-b">
@@ -152,8 +161,107 @@
       </article>`).join('')
       : '<p class="small muted">Rencana baca belum diisi. Pengurus dapat menambahkannya di Kelola Konten.</p>';
 
-    books.innerHTML = ['Matius','Markus','Lukas','Yohanes','Kisah Para Rasul','Roma','1 Korintus','Efesus']
-      .map(b => `<button class="chip" style="justify-content:center;padding:12px">${b}</button>`).join('');
+    /* ---------- daftar kitab ---------- */
+    const KITAB = {
+      pb: [['Matius',28],['Markus',16],['Lukas',24],['Yohanes',21],['Kisah Para Rasul',28],
+           ['Roma',16],['1 Korintus',16],['2 Korintus',13],['Galatia',6],['Efesus',6],
+           ['Filipi',4],['Kolose',4],['1 Tesalonika',5],['2 Tesalonika',3],['1 Timotius',6],
+           ['2 Timotius',4],['Titus',3],['Filemon',1],['Ibrani',13],['Yakobus',5],
+           ['1 Petrus',5],['2 Petrus',3],['1 Yohanes',5],['2 Yohanes',1],['3 Yohanes',1],
+           ['Yudas',1],['Wahyu',22]],
+      pl: [['Kejadian',50],['Keluaran',40],['Imamat',27],['Bilangan',36],['Ulangan',34],
+           ['Yosua',24],['Hakim-Hakim',21],['Rut',4],['1 Samuel',31],['2 Samuel',24],
+           ['1 Raja-Raja',22],['2 Raja-Raja',25],['Ayub',42],['Amsal',31],['Pengkhotbah',12],
+           ['Yesaya',66],['Yeremia',52],['Daniel',12],['Hosea',14],['Yunus',4],['Mikha',7],
+           ['Maleakhi',4]],
+      mz: [['Mazmur',150]]
+    };
+    let bagian = 'pb';
+
+    function gambarKitab() {
+      books.innerHTML = KITAB[bagian].map(([nama, pasal]) => `
+        <button class="chip" data-kitab="${nama}" data-pasal="${pasal}"
+          style="justify-content:space-between;padding:12px 14px;text-align:left">
+          <span>${nama}</span>
+          <span class="muted" style="font-size:10px">${pasal} pasal</span>
+        </button>`).join('');
+
+      books.querySelectorAll('[data-kitab]').forEach(b =>
+        b.addEventListener('click', () => bukaKitab(b.dataset.kitab, +b.dataset.pasal)));
+    }
+
+    /* pilih pasal, lalu buka teksnya */
+    function bukaKitab(nama, jumlahPasal) {
+      const pilihan = [];
+      for (let i = 1; i <= jumlahPasal; i++) pilihan.push(i);
+      const m = SGK.modal(`
+        <div class="lab">Pilih pasal</div>
+        <h3 style="margin:8px 0 4px">${nama}</h3>
+        <p class="small muted">${jumlahPasal} pasal</p>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px;
+                    margin:18px 0;max-height:230px;overflow-y:auto">
+          ${pilihan.map(n => `<button class="chip" data-p="${n}"
+            style="justify-content:center;padding:9px 0">${n}</button>`).join('')}
+        </div>
+        <button class="btn btn-line btn-full" data-close>Tutup</button>`);
+
+      m.el.querySelectorAll('[data-p]').forEach(b =>
+        b.addEventListener('click', async () => {
+          m.close();
+          await tampilkanPasal(nama, +b.dataset.p);
+        }));
+    }
+
+    async function tampilkanPasal(nama, nomor) {
+      // Teks resmi LAI hanya ditampilkan bila kunci API sudah diisi.
+      if (!DB.bible.apiSiap()) {
+        window.open(DB.bible.tautanLuar(nama, nomor), '_blank', 'noopener');
+        return;
+      }
+      SGK.toast('Memuat ' + nama + ' ' + nomor + '…');
+      const data = await DB.bible.pasal(nama, nomor);
+      if (!data) return;
+
+      const ayat = (data.verses || data.data || []).map(v =>
+        `<p style="margin-bottom:10px;font-size:14.5px;line-height:1.8">
+           <b style="color:var(--gold);font-size:11px;vertical-align:super">${v.verse ?? ''}</b>
+           ${(v.content || v.text || '')}</p>`).join('');
+
+      const m = SGK.modal(`
+        <div class="lab">Alkitab Terjemahan Baru</div>
+        <h3 style="margin:8px 0 14px">${nama} ${nomor}</h3>
+        <div style="max-height:52vh;overflow-y:auto;text-align:left">${ayat ||
+          '<p class="muted">Teks tidak ditemukan.</p>'}</div>
+        <p class="small muted" style="margin-top:14px">
+          Teks Alkitab © Lembaga Alkitab Indonesia. Dipakai atas izin.</p>
+        <button class="btn btn-navy btn-full" style="margin-top:12px" data-close>Tutup</button>`);
+      m.el.querySelector('.box').style.maxWidth = '520px';
+    }
+
+    /* saringan Perjanjian Baru / Lama / Mazmur */
+    const tabKitab = books.previousElementSibling;
+    if (tabKitab && tabKitab.classList.contains('tabs')) {
+      tabKitab.innerHTML = `
+        <button class="tab on" data-bagian="pb">Perjanjian Baru</button>
+        <button class="tab" data-bagian="pl">Perjanjian Lama</button>
+        <button class="tab" data-bagian="mz">Mazmur</button>`;
+      tabKitab.addEventListener('click', e => {
+        const b = e.target.closest('[data-bagian]'); if (!b) return;
+        tabKitab.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t === b));
+        bagian = b.dataset.bagian;
+        gambarKitab();
+      });
+    }
+
+    gambarKitab();
+
+    if (!DB.bible.apiSiap()) {
+      books.insertAdjacentHTML('afterend',
+        `<p class="small muted" style="margin-top:14px">
+           Teks Alkitab dibuka di Alkitab SABDA pada tab baru. Untuk membacanya
+           langsung di dalam aplikasi, pengurus dapat mengajukan kunci API resmi
+           ke Lembaga Alkitab Indonesia.</p>`);
+    }
 
     App.bindAll();
     SGK.paintScenes();

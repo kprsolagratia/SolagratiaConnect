@@ -58,6 +58,16 @@
       'Email not confirmed': 'Email belum dikonfirmasi. Periksa kotak masuk Anda.',
       'User already registered': 'Email ini sudah terdaftar. Silakan masuk.',
       'Password should be at least 6 characters': 'Kata sandi minimal 6 karakter.',
+      'email rate limit exceeded':
+        'Batas pengiriman email tercapai. Coba lagi satu jam lagi, atau minta pengurus ' +
+        'mematikan konfirmasi email di Supabase.',
+      'Email rate limit exceeded':
+        'Batas pengiriman email tercapai. Coba lagi satu jam lagi, atau minta pengurus ' +
+        'mematikan konfirmasi email di Supabase.',
+      'For security purposes, you can only request this after 60 seconds.':
+        'Tunggu satu menit sebelum mencoba lagi.',
+      'Signups not allowed for this instance':
+        'Pendaftaran sedang ditutup. Hubungi pengurus jemaat.',
       'Failed to fetch': 'Tidak dapat terhubung. Periksa koneksi internet.'
     };
     if (peta[m]) return peta[m];
@@ -75,6 +85,8 @@
       return 'Data ini sudah ada sebelumnya.';
     if (/violates foreign key/i.test(m))
       return 'Data yang dituju tidak ditemukan. Mungkin sudah dihapus.';
+    if (/rate limit/i.test(m))
+      return 'Terlalu banyak percobaan. Tunggu sebentar, lalu coba lagi.';
     if (/JWT|token/i.test(m))
       return 'Sesi berakhir. Silakan masuk kembali.';
     return m;
@@ -342,6 +354,43 @@
       const { count } = await sb.from('reading_progress').select('day', { count: 'exact', head: true }).eq('user_id', user.id);
       const { data } = await sb.from('reading_progress').select('day').eq('user_id', user.id);
       return { done: count || 0, total: 365, map: Object.fromEntries((data || []).map(r => [r.day, true])) };
+    },
+
+    /** Apakah teks Alkitab di dalam aplikasi sudah diaktifkan? */
+    apiSiap() {
+      return !!(CFG.ALKITAB_API_KEY && CFG.ALKITAB_API_URL);
+    },
+
+    /**
+     * Ambil satu pasal dari API resmi LAI.
+     * Bila kunci belum diisi, kembalikan null — pemanggil akan
+     * mengarahkan pengguna ke Alkitab SABDA di tab baru.
+     */
+    async pasal(kitab, nomor) {
+      if (!bible.apiSiap()) return null;
+      const versi = CFG.ALKITAB_VERSI || 'tb';
+      const alamat = CFG.ALKITAB_API_URL + '/bible/' + versi + '/' +
+        encodeURIComponent(String(kitab).toLowerCase()) + '/' + (Number(nomor) || 1);
+      try {
+        const res = await fetch(alamat, {
+          headers: {
+            'Authorization': 'Bearer ' + CFG.ALKITAB_API_KEY,
+            'Accept': 'application/json'
+          }
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return await res.json();
+      } catch (e) {
+        console.error('[SGKConnect] Alkitab:', e);
+        w.SGK && w.SGK.toast && w.SGK.toast('Teks Alkitab belum bisa dimuat.');
+        return null;
+      }
+    },
+
+    /** Tautan ke Alkitab SABDA — dipakai selama API belum aktif. */
+    tautanLuar(kitab, nomor) {
+      return 'https://alkitab.sabda.org/passage.php?passage=' +
+        encodeURIComponent(kitab + ' ' + (nomor || 1));
     },
 
     async toggleDay(day) {
@@ -612,6 +661,50 @@
       const { count } = await sb.from('profiles')
         .select('id', { count: 'exact', head: true }).in('role', ['admin', 'leader', 'pastor']);
       return count || 0;
+    },
+
+    /** Rata-rata progres baca seluruh jemaat — dihitung dari data nyata. */
+    async readingOverview() {
+      if (!sb) return { rata: 0, hari: 0, total: 365, pembaca: 0, anggota: 0 };
+      const [maju, anggota] = await Promise.all([
+        sb.from('reading_progress').select('user_id'),
+        sb.from('profiles').select('id', { count: 'exact', head: true })
+      ]);
+      const baris = maju.data || [];
+      const perOrang = {};
+      baris.forEach(r => { perOrang[r.user_id] = (perOrang[r.user_id] || 0) + 1; });
+      const pembaca = Object.keys(perOrang).length;
+      const totalHari = baris.length;
+      const jumlahAnggota = anggota.count || 0;
+      // rata-rata dihitung terhadap seluruh anggota, bukan hanya yang membaca
+      const rata = jumlahAnggota ? Math.round(totalHari / jumlahAnggota / 365 * 100) : 0;
+      const rataHari = jumlahAnggota ? Math.round(totalHari / jumlahAnggota) : 0;
+      return { rata, hari: rataHari, total: 365, pembaca, anggota: jumlahAnggota };
+    },
+
+    /** Data ringkas untuk laporan bulanan. */
+    async monthlyReport() {
+      if (!sb) return null;
+      const awal = new Date(); awal.setDate(1); awal.setHours(0, 0, 0, 0);
+      const [anggota, hadir, doa, kegiatan, baru] = await Promise.all([
+        sb.from('profiles').select('id', { count: 'exact', head: true }),
+        sb.from('attendance').select('id', { count: 'exact', head: true })
+          .gte('checked_in_at', awal.toISOString()),
+        sb.from('prayers').select('id', { count: 'exact', head: true })
+          .gte('created_at', awal.toISOString()),
+        sb.from('events').select('id,title,starts_at')
+          .gte('starts_at', awal.toISOString()).order('starts_at'),
+        sb.from('profiles').select('id', { count: 'exact', head: true })
+          .gte('joined_at', awal.toISOString())
+      ]);
+      return {
+        bulan: awal.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }),
+        anggota: anggota.count || 0,
+        anggotaBaru: baru.count || 0,
+        kehadiran: hadir.count || 0,
+        pokokDoa: doa.count || 0,
+        kegiatan: kegiatan.data || []
+      };
     },
 
     async attendanceByMonth() {

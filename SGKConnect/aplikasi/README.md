@@ -42,6 +42,8 @@ sgkconnect/
 ├── .env.example          Contoh konfigurasi — salin jadi .env
 ├── data-template/        Templat CSV untuk diisi data jemaat
 ├── PANDUAN-LENGKAP.md    Panduan runtut: nol → localhost → online
+├── PANDUAN-RENUNGAN-ALKITAB.md  Cara membuat renungan & mengaktifkan teks Alkitab
+├── PANDUAN-EMAIL.md      Mengatasi batas pengiriman email saat pendaftaran
 ├── DEPLOY.md             Versi ringkas panduan deploy
 ├── STATUS-FITUR.md       Daftar fitur: yang jalan penuh vs yang masih tampilan
 ├── assets/
